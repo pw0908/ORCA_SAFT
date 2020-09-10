@@ -1,0 +1,12 @@
+
+! HFLD aug-cc-pVDZ aug-cc-pVDZ/C RIJK verytightscf TightPNO 
+%maxcore 6000
+%scf maxiter 999 end
+%mdci TCutPairs 0 TCutPNO 1e-8 LocMaxIter 10000 LocMaxIterLED 1000  end
+%basis auxjk "autoaux" end
+
+* xyz 0 1
+  Ar(1)	0.9108830843703882	0.03674336373734943	0.026610159148894637
+*
+
+
