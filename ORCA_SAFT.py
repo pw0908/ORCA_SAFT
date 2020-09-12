@@ -1,8 +1,9 @@
 import subprocess,os,glob
 import numpy as np
-from math import exp
+from math import exp, sqrt, acos, cos, sin
 from scipy.interpolate import interp1d
 from scipy.optimize import fsolve,minimize
+from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
 from openbabel import pybel
 
@@ -14,7 +15,7 @@ class ORCA_SAFT(object):
 
     # Set it up in 3D coordinates
     mol.make3D()
-    
+
     self.smiles = smiles
     self.method = method
     self.path_orca = path_orca
@@ -71,8 +72,6 @@ class ORCA_SAFT(object):
     file.write("*\n\n\n")    
     file.close()
 
-
-
     print("orca "+smiles+"_opt.inp>"+smiles+"_opt.out")
     subprocess.run(path_orca+" "+smiles+"_opt.inp>"+smiles+"_opt.out", shell=True)
     
@@ -123,6 +122,78 @@ class ORCA_SAFT(object):
             file.write("  "+atom_type+"(2)\t"+str(x)+"\t"+str(y)+"\t"+str(z+r[j])+"\n")
         file.write("*\n\n\n")    
     file.close()
+
+ def GetAtomInfo(self, mol):
+    # get a list of atom types and coords
+    atom_type = []
+    atom_coord = []
+    atom_mass = []
+    for iAtom in range(len(mol.atoms)):
+        atom = mol.atoms[iAtom]
+        atom_type.append(atom.type.split("3")[0])
+        x = atom.coords[0]
+        y = atom.coords[1]
+        z = atom.coords[2]
+        atom_coord.append([x,y,z])
+        atom_mass.append(atom.atomicmass)
+    return atom_type, atom_coord, atom_mass
+
+ def CoM(self, atom_coord, atom_mass):
+    # get center of mass
+    M = 0.
+    moment = [0., 0., 0.]
+    for iAtom in range(len(atom_coord)):
+        M += atom_mass[iAtom]
+        for jCoord in range(3):
+            moment[jCoord] += atom_coord[iAtom][jCoord]*atom_mass[iAtom]
+    CoM = [iMoment / M for iMoment in moment]
+    return CoM
+ 
+ def SetCoMOrigin(self, atom_coord, atom_mass):
+    # set the molecule center of mass to the origin 
+    CoM = self.CoM(atom_coord, atom_mass)
+    for iAtom in range(len(atom_coord)):
+        for jCoord in range(3):
+            atom_coord[iAtom][jCoord] -= CoM[jCoord]
+    return atom_coord
+
+ def SetCenterOrigin(self, atom_coord):
+    # for tetragonal point group Td only, set the center atom to be at the origin
+    # using SetToOrigin() based on CoM gives the center coordinate a tiny displacement from origin
+    atom_center = atom_coord[0].copy()
+    for iAtom in range(len(atom_coord)):
+        for jCoord in range(3):
+            atom_coord[iAtom][jCoord] -= atom_center[jCoord]
+    return atom_coord
+
+ def UnitVector(self, vector):
+    # get a unit vector from a given vector
+    length = Length(vector)
+    unitvector = [iVector / length for iVector in vector]
+    return unitvector 
+ 
+ def Length(self, vector):
+    # get the length of the vector
+    length = sqrt( sum(iVector*iVector for iVector in vector) )
+    return length
+
+ def Reflection(self, axis, coord):
+    # reflection about the plane that is perpandicular to the given axis and contains the origin
+    if axis == "x":
+        coord[0] = -coord[0]
+    if axis == "y":
+        coord[1] = -coord[1]
+    if axis == "z":
+        coord[2] = -coord[2]
+    return coord
+
+ def InitializeTdGeom(self, atom_coord):
+    # the first geometry
+    R.align_vectors([[1.,0.,0.],[-1./3., sin(acos(-1./3.)) , 0.]], [UnitVector(atom_coord[1]), UnitVector(atom_coord[1])])
+
+
+
+
  def MolVol(self,cutoff=0.001):
     # Attempt to obtain V_QC from multiwfn
     smiles = self.smiles
@@ -141,7 +212,6 @@ class ORCA_SAFT(object):
 
     # Run input file
     subprocess.run(path_multiwfn+" "+smiles+"_pure_wfn.txt>"+smiles+"_VdW_vol.txt", shell=True)
-
 
     # Read output file
     with open(smiles+"_VdW_vol.txt","r") as f:
