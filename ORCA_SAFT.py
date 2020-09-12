@@ -16,6 +16,7 @@ class ORCA_SAFT(object):
     mol.make3D()
     
     self.smiles = smiles
+    self.method = method
     self.path_orca = path_orca
     self.path_multiwfn = path_multiwfn
 
@@ -43,7 +44,50 @@ class ORCA_SAFT(object):
     file.close()
 
     # Add step here to determine Vol and good guess for sigma from multiwfn
-    r = np.linspace(3.3,7,50)
+    if os.path.exists(smiles+"_opt.inp"):
+        os.remove(smiles+"_opt.inp")
+    file = open(smiles+"_opt.inp","w")
+    with open(method) as f:
+        lines = f.read().split("\n")
+        for i in range(len(lines)):
+            if "!" in lines[i]:
+                file.write("! RKS B3LYP D3BJ Opt"+"\n")
+    file.write("\n")
+    file.write("* xyz 0 1\n")
+    for i in range(len(mol.atoms)):
+        atom = mol.atoms[i]
+        atom_type = atom.type.split("3")[0]
+        x = atom.coords[0]
+        y = atom.coords[1]
+        z = atom.coords[2]
+        file.write("  "+atom_type+"(1)\t"+str(x)+"\t"+str(y)+"\t"+str(z)+"\n")
+    for i in range(len(mol.atoms)):
+        atom = mol.atoms[i]
+        atom_type = atom.type.split("3")[0]
+        x = atom.coords[0]
+        y = atom.coords[1]
+        z = atom.coords[2]
+        file.write("  "+atom_type+"(2)\t"+str(x)+"\t"+str(y)+"\t"+str(z+5)+"\n")
+    file.write("*\n\n\n")    
+    file.close()
+
+
+
+    print("orca "+smiles+"_opt.inp>"+smiles+"_opt.out")
+    subprocess.run(path_orca+" "+smiles+"_opt.inp>"+smiles+"_opt.out", shell=True)
+    
+    x = []
+    y = []
+    z = []
+    with open(smiles+"_opt.xyz","r") as f:
+        lines = f.read().split("\n")
+        for i,line in enumerate(lines[2:len(lines)-1]):
+            words =line.split()
+            x.append(float(words[1]))
+            y.append(float(words[2]))
+            z.append(float(words[3]))
+    r0 = ((x[0]-x[1])**2+(y[0]-y[1])**2+(z[0]-z[1])**2)**(0.5)
+    r = np.linspace(0.95*r0,2*r0,50)
     self.r = r
 
     # Creating dimer input file
