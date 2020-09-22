@@ -8,6 +8,64 @@ import matplotlib.pyplot as plt
 from openbabel import pybel
 from copy import deepcopy
 
+# Generate input files for ORCA calculations
+# This input file generator is expected to generate input files
+# for different purposes, e.g. single molecule, dimer with different 
+# orientations and else 
+class GenerateInput(object):
+ def __init__(self,smiles,method="HFLD_pVDZ.txt",path_multiwfn="multiwfn"):
+    
+    # Create a Molecule object in pybel
+    mol = pybel.readstring("smi",smiles)
+
+    # Set it up in 3D coordinates
+    mol.make3D()
+
+    self.smiles = smiles
+    self.method = method
+    self.path_orca = path_orca
+    self.path_multiwfn = path_multiwfn
+    self.AtomInfo = []
+    self.AtomInfo.append(deepcopy(AtomInfo(mol)))
+    self.AtomInfo.append(deepcopy(AtomInfo(mol)))
+    AI = self.AtomInfo
+
+
+
+# collection of functions to get SAFT parameters out, and 
+# sigma, epsilon -> Vol and m -> lambdas 
+# write this as a class? or a separate python file?
+class GetSAFTParameters(object):
+
+# function for running ORCA
+def RunORCA(InputFile, mode = "single", \
+ hour = 0, minute = 30, node = 1, mem = 16, ncpus = 8, env = "abinitioSAFT", path_orca = "orca"):
+    if mode == "single":
+        print(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out")
+        subprocess.run(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out", shell=True)
+    if mode == "parallel":
+        if path_orca == "orca":
+            raise Exception("Exact orca path need to be specified")
+        PBSName = GeneratePBS(InputFile=InputFile,hour=hour,minute=minute,node=node,mem=mem,ncpus=ncpus,env=env,path_orca=path_orca)
+        print("qsub "+PBSName)
+        subprocess.run("qsub "+PBSName, shell=True)
+
+# function for generating PBS file for submitting HPC job
+def GeneratePBS(*, InputFile, hour, minute, node, mem, ncpus, env, path_orca):
+    PBSName = InputFile.split(".")[0]+".pbs"
+    if os.path.exists(PBSName):
+        os.remove(PBSName)
+    file = open(PBSName,"w")
+    file.write("PBS -l walltime="+str(int(hour))+":"+str(int(minute))+":00\n")
+    file.write("PBS -l select="+str(int(node))+":ncpus="+str(int(ncpus))+":mem="+str(int(mem))+"gb:mpiprocs="+str(int(ncpus))+"\n")         
+    file.write("module load anaconda3/personal\n")
+    file.write("source activate "+env+"\n")
+    file.write("export OMPI_MCA_btl=self,vader,tcp\n")
+    file.write("path_orca"+" "+InputFile+">"+InputFile.split(".")[0]+".out\n")
+    file.write("conda deactivate\n")
+    file.close()
+    return PBSName
+
 class ORCA_SAFT(object):
  def __init__(self,smiles,method="HFLD_pVDZ.txt",path_orca="orca",path_multiwfn="multiwfn"):
     
