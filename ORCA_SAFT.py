@@ -123,77 +123,6 @@ class ORCA_SAFT(object):
         file.write("*\n\n\n")    
     file.close()
 
- def GetAtomInfo(self, mol):
-    # get a list of atom types and coords
-    atom_type = []
-    atom_coord = []
-    atom_mass = []
-    for iAtom in range(len(mol.atoms)):
-        atom = mol.atoms[iAtom]
-        atom_type.append(atom.type.split("3")[0])
-        x = atom.coords[0]
-        y = atom.coords[1]
-        z = atom.coords[2]
-        atom_coord.append([x,y,z])
-        atom_mass.append(atom.atomicmass)
-    return atom_type, atom_coord, atom_mass
-
- def CoM(self, atom_coord, atom_mass):
-    # get center of mass
-    M = 0.
-    moment = [0., 0., 0.]
-    for iAtom in range(len(atom_coord)):
-        M += atom_mass[iAtom]
-        for jCoord in range(3):
-            moment[jCoord] += atom_coord[iAtom][jCoord]*atom_mass[iAtom]
-    CoM = [iMoment / M for iMoment in moment]
-    return CoM
- 
- def SetCoMOrigin(self, atom_coord, atom_mass):
-    # set the molecule center of mass to the origin 
-    CoM = self.CoM(atom_coord, atom_mass)
-    for iAtom in range(len(atom_coord)):
-        for jCoord in range(3):
-            atom_coord[iAtom][jCoord] -= CoM[jCoord]
-    return atom_coord
-
- def SetCenterOrigin(self, atom_coord):
-    # for tetragonal point group Td only, set the center atom to be at the origin
-    # using SetToOrigin() based on CoM gives the center coordinate a tiny displacement from origin
-    atom_center = atom_coord[0].copy()
-    for iAtom in range(len(atom_coord)):
-        for jCoord in range(3):
-            atom_coord[iAtom][jCoord] -= atom_center[jCoord]
-    return atom_coord
-
- def UnitVector(self, vector):
-    # get a unit vector from a given vector
-    length = Length(vector)
-    unitvector = [iVector / length for iVector in vector]
-    return unitvector 
- 
- def Length(self, vector):
-    # get the length of the vector
-    length = sqrt( sum(iVector*iVector for iVector in vector) )
-    return length
-
- def Reflection(self, axis, coord):
-    # reflection about the plane that is perpandicular to the given axis and contains the origin
-    if axis == "x":
-        coord[0] = -coord[0]
-    if axis == "y":
-        coord[1] = -coord[1]
-    if axis == "z":
-        coord[2] = -coord[2]
-    return coord
-
- def InitializeTdGeom(self, atom_coord):
-    # the first geometry
-    R.align_vectors([[1.,0.,0.],[-1./3., sin(acos(-1./3.)) , 0.]], [UnitVector(atom_coord[1]), UnitVector(atom_coord[1])])
-
-
-
-
  def MolVol(self,cutoff=0.001):
     # Attempt to obtain V_QC from multiwfn
     smiles = self.smiles
@@ -324,3 +253,168 @@ class ORCA_SAFT(object):
     # ax.set_ylim(-1.1, 2)
     # ax.set_xlim(0.6,1.9)
     plt.show()
+
+class AtomInfo(object):
+ # get a list of atom types and coords
+ def __init__(self, mol):
+    mol.make3D()
+    self.type  = [] 
+    self.coord = []
+    self.mass  = []
+    self.M     = 0.
+    for iAtom in range(len(mol.atoms)):
+        atom = mol.atoms[iAtom]
+        self.type.append(atom.type.split("3")[0])
+        x = atom.coords[0]
+        y = atom.coords[1]
+
+
+        z = atom.coords[2]
+        self.coord.append([x,y,z])
+        self.mass.append(atom.atomicmass)
+        self.M += atom.atomicmass
+    self.GetCoM()
+
+ def GetCoM(self):
+    # get center of mass
+    moment = [0., 0., 0.]
+    for iAtom in range(len(self.type)):
+        for jCoord in range(3):
+            moment[jCoord] += self.coord[iAtom][jCoord]*self.mass[iAtom]
+    self.CoM = [iMoment / self.M for iMoment in moment]
+
+ def SetCoMOrigin(self):
+    # set the molecule center of mass to the origin 
+    for iAtom in range(len(self.type)):
+        for jCoord in range(3):
+            self.coord[iAtom][jCoord] -= self.CoM[jCoord]
+
+ def SetCenterOrigin(self):
+    # for tetragonal point group Td only, set the center atom to be at the origin
+    # using SetToOrigin() based on CoM gives the center coordinate a tiny displacement from origin
+    atom_center = self.coord[0].copy()
+    for iAtom in range(len(self.type)):
+        for jCoord in range(3):
+            self.coord[iAtom][jCoord] -= atom_center[jCoord]
+
+ def UnitVector(self, vector):
+    # get a unit vector from a given vector
+    length = self.Length(vector)
+    unitvector = [iVector / length for iVector in vector]
+    return unitvector 
+ 
+ def Length(self, vector):
+    # get the length of the vector
+    length = sqrt( sum(iVector*iVector for iVector in vector) )
+    return length
+
+ def Reflection(self, axis):
+    # reflection about the plane that is perpandicular to the given axis and contains the origin
+    for iAtom in range(len(self.type)):
+        if axis == "x":
+            self.coord[0] = -self.coord[0]
+        if axis == "y":
+            self.coord[1] = -self.coord[1]
+        if axis == "z":
+            self.coord[2] = -self.coord[2]
+
+ def TdOrient(self, config = "A"):
+    self.SetCenterOrigin()
+    UVec12 = [self.UnitVector(self.coord[1]), self.UnitVector(self.coord[2])]
+    if config == "A":
+        # the first and initial orientation, A (CH4 as an example) 
+        #    H2               y        
+        #     \               ^  z       
+        #      \              |'/|       
+        #       \             |/      
+        #       .C------- H1  |----->x
+        #     .'/|           
+        #  H4' / |          
+        #     /__|           
+        #      H3
+        r , rmsd = R.align_vectors([[1.,0.,0.],[-1./3., sin(acos(-1./3.)) , 0.]], UVec12)
+
+    elif config == "B":
+        # Orientation B (CH4 as an example)
+        #      H4                                 
+        #     \¯¯|          
+        #  H3. \ |           
+        #     '.\|          
+        #       'C------- H1
+        #       /
+        #      / 
+        #     /
+        #    H2
+        r , rmsd = R.align_vectors([[1.,0.,0.],[-1./3.,-sin(acos(-1./3.)) , 0.]], UVec12)
+
+    elif config == "C":
+        # Orientation C (CH4 as an example)
+        #                H2
+        #               /
+        #              /
+        #             /
+        #  H1 -------C.
+        #            |\'.
+        #            | \ 'H3
+        #            |__\
+        #             H4
+        r , rmsd = R.align_vectors([[-1.,0.,0.],[1./3.,sin(acos(-1./3.)) , 0.]], UVec12)
+
+    elif config == "D":
+        # Orientation D (CH4 as an example)
+        #             H3
+        #            |¯¯/
+        #            | / .H4
+        #            |/.'
+        #  H1 -------C'
+        #             \
+        #              \ 
+        #               \
+        #                H2
+        r , rmsd = R.align_vectors([[-1.,0.,0.],[1./3.,-sin(acos(-1./3.)) , 0.]], UVec12)
+    
+    elif config == "E":
+        # Orientation E (CH4 as an example)
+        #    H1
+        #     \
+        #      \       
+        #       \ ,,.--'' H4
+        #        C________
+        #       / ¯`-.__ | H3
+        #      /        ¯`
+        #     /
+        #    H2
+        r , rmsd = R.align_vectors([[-cos(acos(-1./3.)/2.),  sin(acos(-1./3.)/2.), 0.],\
+                                    [-cos(acos(-1./3.)/2.), -sin(acos(-1./3.)/2.), 0.]], UVec12)
+
+    elif config == "F":
+        # Orientation F (CH4 as an example)
+        #                H1
+        #               /
+        #              /    
+        #  H3 ''--... /
+        #    ________C
+        # H4 | __.-'¯ \
+        #    '¯        \ 
+        #               \
+        #                H2
+        r , rmsd = R.align_vectors([[cos(acos(-1./3.)/2.), sin(acos(-1./3.)/2.), 0.],\
+                                    [cos(acos(-1./3.)/2.),-sin(acos(-1./3.)/2.), 0.]], UVec12)
+    else:
+        raise Exception("config must be A or B or C or D or E or F")
+
+    for iAtom in range(len(self.type)):
+        self.coord[iAtom] = r.apply(self.coord[iAtom]) 
+
+class const(object):
+    # useful constants
+    def __init__(self):
+        # ORCA 4.2.1 manual
+        self.Hartree2eV = 27.2113834
+        # NIST CODATA 2018
+        self.eV2K       = 1.160451812e4
+        self.Hartree2K  = self.Hartree2eV*self.eV2K
+        # ORCA 4.2.1 manual
+        self.Bohr2A     = 0.5291772083
+        # Boltzmann in eV
+        self.Boltzmann  = 8.617333262e-5
