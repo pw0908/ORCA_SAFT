@@ -6,6 +6,7 @@ from scipy.optimize import fsolve,minimize
 from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
 from openbabel import pybel
+from copy import deepcopy
 
 class ORCA_SAFT(object):
  def __init__(self,smiles,method="HFLD_pVDZ.txt",path_orca="orca",path_multiwfn="multiwfn"):
@@ -20,6 +21,14 @@ class ORCA_SAFT(object):
     self.method = method
     self.path_orca = path_orca
     self.path_multiwfn = path_multiwfn
+    self.AtomInfo = []
+    self.AtomInfo.append(deepcopy(AtomInfo(mol)))
+    self.AtomInfo.append(deepcopy(AtomInfo(mol)))
+    AI = self.AtomInfo
+    #----------------------------------------------------------------------
+    # need a handle to input the orientations from job submission 
+    TdOriList = ["AA", "AB", "AC", "AD", "CA", "CB", "EE", "EF", "AE", "AF", "FA", "CF"]
+    #----------------------------------------------------------------------
 
     # Making pure input file
     if os.path.exists(smiles+"_pure.inp"):
@@ -34,16 +43,23 @@ class ORCA_SAFT(object):
 
     # Obtain the atom coordinates for a molecule
     # N.B. This may need some tweaking as this is not often reproducible
-    for i in range(len(mol.atoms)):
-        atom = mol.atoms[i]
-        atom_type = atom.type.split("3")[0]
-        x = atom.coords[0]
-        y = atom.coords[1]
-        z = atom.coords[2]
-        file.write("  "+atom_type+"(1)\t"+str(x)+"\t"+str(y)+"\t"+str(z)+"\n")
+    
+    # the old way to assign coordinates:
+    # for i in range(len(mol.atoms)):
+    #     atom = mol.atoms[i]
+    #     atom_type = atom.type.split("3")[0]
+    #     x = atom.coords[0]
+    #     y = atom.coords[1]
+    #     z = atom.coords[2]
+    #     file.write("  "+atom_type+"(1)\t"+str(x)+"\t"+str(y)+"\t"+str(z)+"\n")
+
+    for i in range(AI[0].NAtoms):
+        file.write("  "+AI[0].type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
     file.write("*\n\n\n")    
     file.close()
-
+    
+    #----------------------------------------------------------------------
+    # need modify
     # Add step here to determine Vol and good guess for sigma from multiwfn
     if os.path.exists(smiles+"_opt.inp"):
         os.remove(smiles+"_opt.inp")
@@ -55,20 +71,10 @@ class ORCA_SAFT(object):
                 file.write("! RKS B3LYP D3BJ Opt"+"\n")
     file.write("\n")
     file.write("* xyz 0 1\n")
-    for i in range(len(mol.atoms)):
-        atom = mol.atoms[i]
-        atom_type = atom.type.split("3")[0]
-        x = atom.coords[0]
-        y = atom.coords[1]
-        z = atom.coords[2]
-        file.write("  "+atom_type+"(1)\t"+str(x)+"\t"+str(y)+"\t"+str(z)+"\n")
-    for i in range(len(mol.atoms)):
-        atom = mol.atoms[i]
-        atom_type = atom.type.split("3")[0]
-        x = atom.coords[0]
-        y = atom.coords[1]
-        z = atom.coords[2]
-        file.write("  "+atom_type+"(2)\t"+str(x)+"\t"+str(y)+"\t"+str(z+5)+"\n")
+    for i in range(AI[0].NAtoms):
+        file.write("  "+AI[0].type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
+    for i in range(AI[0].NAtoms):
+        file.write("  "+AI[0].type[i]+"(1)\t"+str(AI[1].coord[i][0])+"\t"+str(AI[1].coord[i][1])+"\t"+str(AI[1].coord[i][2])+"\n")
     file.write("*\n\n\n")    
     file.close()
 
@@ -88,111 +94,42 @@ class ORCA_SAFT(object):
     r0 = ((x[0]-x[1])**2+(y[0]-y[1])**2+(z[0]-z[1])**2)**(0.5)
     r = np.linspace(0.95*r0,2*r0,50)
     self.r = r
+    #----------------------------------------------------------------------
 
     # Creating dimer input file
     if os.path.exists(smiles+"_dimer.inp"):
         os.remove(smiles+"_dimer.inp")
     file = open(smiles+"_dimer.inp","w")
-    for j in range(len(r)):
-        if j!=0:
-            file.write("$new_job\n")
-        with open(method) as f:
-            lines = f.read().split("\n")
-            for i in range(len(lines)):
-                file.write(lines[i]+"\n")
-        file.write("\n")
-        file.write("* xyz 0 1\n")
-
-        # Molecule 1
-        for i in range(len(mol.atoms)):
-            atom = mol.atoms[i]
-            atom_type = atom.type.split("3")[0]
-            x = atom.coords[0]
-            y = atom.coords[1]
-            z = atom.coords[2]
-            file.write("  "+atom_type+"(1)\t"+str(x)+"\t"+str(y)+"\t"+str(z)+"\n")
+    with open(method) as f:
+        lines = f.read().split("\n")
+        for i in range(len(lines)):
+            file.write(lines[i]+"\n")
+    file.write("\n")
+    file.write("%coords\n")
+    file.write("CTyp\txyz\n")
+    file.write("Charge\t0\n")
+    file.write("Mult\t1\n")
+    file.write("pardef\n")
+    file.write("\tr = "str(0.95*r0)+", "+str(2*r0)+", "+str(int(50))+";"+"\n")
+    file.write("end\n")
+    file.write("coords\n")
+    
+    # dimer file
+    # Molecule 1
+    for i in range(AI.NAtoms):
+        file.write("  "+AI.type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
         
-        # Molecule 2
-        for i in range(len(mol.atoms)):
-            atom = mol.atoms[i]
-            atom_type = atom.type.split("3")[0]
-            x = atom.coords[0]
-            y = atom.coords[1]
-            z = atom.coords[2]
-            file.write("  "+atom_type+"(2)\t"+str(x)+"\t"+str(y)+"\t"+str(z+r[j])+"\n")
-        file.write("*\n\n\n")    
+    # Molecule 2
+    for i in range(AI.NAtoms):
+        file.write("  "+AI.type[i]+"(2)\t"+str(AI[1].coord[i][0])+"+{r}"+"\t"+str(AI[1].coord[i][1])+"\t"+str(AI[1].coord[i][2])+"\n")
+
+    file.write("end\n")
+    file.write("end\n")
+    file.write("%method\n")
+    file.write("ScanGuess MORead\n")
+    file.write("end\n")
+    file.write("\n\n\n")    
     file.close()
-
- def GetAtomInfo(self, mol):
-    # get a list of atom types and coords
-    atom_type = []
-    atom_coord = []
-    atom_mass = []
-    for iAtom in range(len(mol.atoms)):
-        atom = mol.atoms[iAtom]
-        atom_type.append(atom.type.split("3")[0])
-        x = atom.coords[0]
-        y = atom.coords[1]
-        z = atom.coords[2]
-        atom_coord.append([x,y,z])
-        atom_mass.append(atom.atomicmass)
-    return atom_type, atom_coord, atom_mass
-
- def CoM(self, atom_coord, atom_mass):
-    # get center of mass
-    M = 0.
-    moment = [0., 0., 0.]
-    for iAtom in range(len(atom_coord)):
-        M += atom_mass[iAtom]
-        for jCoord in range(3):
-            moment[jCoord] += atom_coord[iAtom][jCoord]*atom_mass[iAtom]
-    CoM = [iMoment / M for iMoment in moment]
-    return CoM
- 
- def SetCoMOrigin(self, atom_coord, atom_mass):
-    # set the molecule center of mass to the origin 
-    CoM = self.CoM(atom_coord, atom_mass)
-    for iAtom in range(len(atom_coord)):
-        for jCoord in range(3):
-            atom_coord[iAtom][jCoord] -= CoM[jCoord]
-    return atom_coord
-
- def SetCenterOrigin(self, atom_coord):
-    # for tetragonal point group Td only, set the center atom to be at the origin
-    # using SetToOrigin() based on CoM gives the center coordinate a tiny displacement from origin
-    atom_center = atom_coord[0].copy()
-    for iAtom in range(len(atom_coord)):
-        for jCoord in range(3):
-            atom_coord[iAtom][jCoord] -= atom_center[jCoord]
-    return atom_coord
-
- def UnitVector(self, vector):
-    # get a unit vector from a given vector
-    length = Length(vector)
-    unitvector = [iVector / length for iVector in vector]
-    return unitvector 
- 
- def Length(self, vector):
-    # get the length of the vector
-    length = sqrt( sum(iVector*iVector for iVector in vector) )
-    return length
-
- def Reflection(self, axis, coord):
-    # reflection about the plane that is perpandicular to the given axis and contains the origin
-    if axis == "x":
-        coord[0] = -coord[0]
-    if axis == "y":
-        coord[1] = -coord[1]
-    if axis == "z":
-        coord[2] = -coord[2]
-    return coord
-
- def InitializeTdGeom(self, atom_coord):
-    # the first geometry
-    R.align_vectors([[1.,0.,0.],[-1./3., sin(acos(-1./3.)) , 0.]], [UnitVector(atom_coord[1]), UnitVector(atom_coord[1])])
-
-
-
 
  def MolVol(self,cutoff=0.001):
     # Attempt to obtain V_QC from multiwfn
@@ -324,3 +261,170 @@ class ORCA_SAFT(object):
     # ax.set_ylim(-1.1, 2)
     # ax.set_xlim(0.6,1.9)
     plt.show()
+
+class AtomInfo(object):
+ # get a list of atom types and coords
+ def __init__(self, mol):
+    mol.make3D()
+    self.type   = [] 
+    self.coord  = []
+    self.mass   = []
+    self.M      = 0.
+    self.NAtoms = len(mol.atoms)
+    for iAtom in range(self.NAtoms):
+        atom = mol.atoms[iAtom]
+        self.type.append(atom.type.split("3")[0])
+        x = atom.coords[0]
+        y = atom.coords[1]
+        z = atom.coords[2]
+        self.coord.append([x,y,z])
+        self.mass.append(atom.atomicmass)
+        self.M += atom.atomicmass
+    self.GetCoM()
+    self.SetCoMOrigin()
+
+ def GetCoM(self):
+    # get center of mass
+    moment = [0., 0., 0.]
+    for iAtom in range(len(self.type)):
+        for jCoord in range(3):
+            moment[jCoord] += self.coord[iAtom][jCoord]*self.mass[iAtom]
+    self.CoM = [iMoment / self.M for iMoment in moment]
+
+ def SetCoMOrigin(self):
+    # set the molecule center of mass to the origin 
+    for iAtom in range(len(self.type)):
+        for jCoord in range(3):
+            self.coord[iAtom][jCoord] -= self.CoM[jCoord]
+
+ def SetCenterOrigin(self):
+    # for tetragonal point group Td only, set the center atom to be at the origin
+    # using SetToOrigin() based on CoM gives the center coordinate a tiny displacement from origin
+    atom_center = self.coord[0].copy()
+    for iAtom in range(len(self.type)):
+        for jCoord in range(3):
+            self.coord[iAtom][jCoord] -= atom_center[jCoord]
+
+ def UnitVector(self, vector):
+    # get a unit vector from a given vector
+    length = self.Length(vector)
+    unitvector = [iVector / length for iVector in vector]
+    return unitvector 
+ 
+ def Length(self, vector):
+    # get the length of the vector
+    length = sqrt( sum(iVector*iVector for iVector in vector) )
+    return length
+
+ def Reflection(self, axis):
+    # reflection about the plane that is perpandicular to the given axis and contains the origin
+    for iAtom in range(len(self.type)):
+        if axis == "x":
+            self.coord[0] = -self.coord[0]
+        if axis == "y":
+            self.coord[1] = -self.coord[1]
+        if axis == "z":
+            self.coord[2] = -self.coord[2]
+
+ def TdOrient(self, config = "A"):
+    self.SetCenterOrigin()
+    UVec12 = [self.UnitVector(self.coord[1]), self.UnitVector(self.coord[2])]
+    if config == "A":
+        # the first and initial orientation, A (CH4 as an example) 
+        #    H2                  y        
+        #     \                  ^       
+        #      \                 |       
+        #       \                |    
+        #       .C------- H1     |----->x
+        #     .'/|              /
+        #  H3' / |             V
+        #     /__|             z
+        #      H4             
+        r , rmsd = R.align_vectors([[1.,0.,0.],[-1./3., sin(acos(-1./3.)) , 0.]], UVec12)
+
+    elif config == "B":
+        # Orientation B (CH4 as an example)
+        #      H3                                 
+        #     \¯¯|          
+        #  H4. \ |           
+        #     '.\|          
+        #       'C------- H1
+        #       /
+        #      / 
+        #     /
+        #    H2
+        r , rmsd = R.align_vectors([[1.,0.,0.],[-1./3.,-sin(acos(-1./3.)) , 0.]], UVec12)
+
+    elif config == "C":
+        # Orientation C (CH4 as an example)
+        #                H2
+        #               /
+        #              /
+        #             /
+        #  H1 -------C.
+        #            |\'.
+        #            | \ 'H4
+        #            |__\
+        #             H3
+        r , rmsd = R.align_vectors([[-1.,0.,0.],[1./3.,sin(acos(-1./3.)) , 0.]], UVec12)
+
+    elif config == "D":
+        # Orientation D (CH4 as an example)
+        #             H4
+        #            |¯¯/
+        #            | / .H3
+        #            |/.'
+        #  H1 -------C'
+        #             \
+        #              \ 
+        #               \
+        #                H2
+        r , rmsd = R.align_vectors([[-1.,0.,0.],[1./3.,-sin(acos(-1./3.)) , 0.]], UVec12)
+    
+    elif config == "E":
+        # Orientation E (CH4 as an example)
+        #    H1
+        #     \
+        #      \       
+        #       \ ,,.--'' H3
+        #        C________
+        #       / ¯`-.__ | H4
+        #      /        ¯`
+        #     /
+        #    H2
+        r , rmsd = R.align_vectors([[-cos(acos(-1./3.)/2.),  sin(acos(-1./3.)/2.), 0.],\
+                                    [-cos(acos(-1./3.)/2.), -sin(acos(-1./3.)/2.), 0.]], UVec12)
+
+    elif config == "F":
+        # Orientation F (CH4 as an example)
+        #                H1
+        #               /
+        #              /    
+        #  H4 ''--... /
+        #    ________C
+        # H3 | __.-'¯ \
+        #    '¯        \ 
+        #               \
+        #                H2
+        r , rmsd = R.align_vectors([[cos(acos(-1./3.)/2.), sin(acos(-1./3.)/2.), 0.],\
+                                    [cos(acos(-1./3.)/2.),-sin(acos(-1./3.)/2.), 0.]], UVec12)
+    else:
+        raise Exception("config must be A or B or C or D or E or F")
+
+    for iAtom in range(len(self.type)):
+        self.coord[iAtom] = r.apply(self.coord[iAtom]) 
+
+ def 
+
+class const(object):
+    # useful constants
+    def __init__(self):
+        # ORCA 4.2.1 manual
+        self.Hartree2eV = 27.2113834
+        # NIST CODATA 2018
+        self.eV2K       = 1.160451812e4
+        self.Hartree2K  = self.Hartree2eV*self.eV2K
+        # ORCA 4.2.1 manual
+        self.Bohr2A     = 0.5291772083
+        # Boltzmann in eV
+        self.Boltzmann  = 8.617333262e-5
