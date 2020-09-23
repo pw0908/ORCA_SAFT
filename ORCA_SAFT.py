@@ -28,9 +28,76 @@ class GenerateInput(object):
     self.AtomInfo = []
     self.AtomInfo.append(deepcopy(AtomInfo(mol)))
     self.AtomInfo.append(deepcopy(AtomInfo(mol)))
+
+ def InputPure(self, mode = "single", suffix = "pure", ncpus = 8):
     AI = self.AtomInfo
+    if os.path.exists(self.smiles+"_"+suffix+".inp"):
+        os.remove(self.smiles+"_"+suffix+".inp")
+    file = open(self.smiles+"_"+suffix+".inp","w")
+    with open(self.method) as f:
+        lines = f.read().split("\n")
+        for i in range(len(lines)):
+            file.write(lines[i]+"\n")
 
+    if mode == "parallel":
+        file.write("%pal nprocs "+str(int(ncpus))+"\n")
 
+    file.write("\n")
+
+    file.write("* xyz 0 1\n")
+    for i in range(AI[0].NAtoms):
+        file.write("  "+AI[0].type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
+    file.write("*\n\n\n")    
+    file.close()
+
+ def InputDimer(self, rval, mode = "single", suffix = "dimer", ncpus = 8, group = None, ori = None):
+    AI = self.AtomInfo
+    if group == "Td":
+        AI[0].TdOrient(ori[0])
+        AI[1].TdOrient(ori[1])
+    else:
+        pass
+    if os.path.exists(self.smiles+"_"+suffix+".inp"):
+        os.remove(self.smiles+"_"+suffix+".inp")
+    file = open(self.smiles+"_"+suffix+".inp","w")
+    with open(self.method) as f:
+        lines = f.read().split("\n")
+        for i in range(len(lines)):
+            file.write(lines[i]+"\n")
+
+    if mode == "parallel":
+        file.write("%pal nprocs "+str(int(ncpus))+"\n")
+    
+    file.write("\n")
+    file.write("%coords\n")
+    file.write("CTyp\txyz\n")
+    file.write("Charge\t0\n")
+    file.write("Mult\t1\n")
+    file.write("pardef\n")
+    Crval = "["
+    for irval in rval:
+        Crval += str(irval) + " " 
+    Crval += "]" 
+    file.write("\tr "+Crval+";"+"\n")
+    file.write("end\n")
+    file.write("coords\n")
+    
+    # dimer position
+    # Molecule 1
+    for i in range(AI.NAtoms):
+        file.write("  "+AI.type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
+        
+    # Molecule 2
+    for i in range(AI.NAtoms):
+        file.write("  "+AI.type[i]+"(2)\t"+str(AI[1].coord[i][0])+"+{r}"+"\t"+str(AI[1].coord[i][1])+"\t"+str(AI[1].coord[i][2])+"\n")
+
+    file.write("end\n")
+    file.write("end\n")
+    file.write("%method\n")
+    file.write("ScanGuess MORead\n")
+    file.write("end\n")
+    file.write("\n\n\n")    
+    file.close()
 
 # collection of functions to get SAFT parameters out, and 
 # sigma, epsilon -> Vol and m -> lambdas 
@@ -65,6 +132,10 @@ def GeneratePBS(*, InputFile, hour, minute, node, mem, ncpus, env, path_orca):
     file.write("conda deactivate\n")
     file.close()
     return PBSName
+
+
+#--------------------------------------------------------------
+# Old ORCA_SAFT class
 
 class ORCA_SAFT(object):
  def __init__(self,smiles,method="HFLD_pVDZ.txt",path_orca="orca",path_multiwfn="multiwfn"):
@@ -320,6 +391,9 @@ class ORCA_SAFT(object):
     # ax.set_xlim(0.6,1.9)
     plt.show()
 
+# old ORCA_SAFT class end
+# ---------------------------------------------------------------
+
 class AtomInfo(object):
  # get a list of atom types and coords
  def __init__(self, mol):
@@ -471,8 +545,6 @@ class AtomInfo(object):
 
     for iAtom in range(len(self.type)):
         self.coord[iAtom] = r.apply(self.coord[iAtom]) 
-
- def 
 
 class const(object):
     # useful constants
