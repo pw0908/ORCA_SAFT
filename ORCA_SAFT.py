@@ -13,7 +13,7 @@ from copy import deepcopy
 # for different purposes, e.g. single molecule, dimer with different 
 # orientations and else 
 class GenerateInput(object):
- def __init__(self,smiles,method="HFLD_pVDZ.txt",path_multiwfn="multiwfn"):
+ def __init__(self,smiles,method="HFLD_pVDZ.txt",path_multiwfn="multiwfn", path_orca="orca"):
     
     # Create a Molecule object in pybel
     mol = pybel.readstring("smi",smiles)
@@ -45,8 +45,8 @@ class GenerateInput(object):
     file.write("\n")
 
     file.write("* xyz 0 1\n")
-    for i in range(AI[0].NAtoms):
-        file.write("  "+AI[0].type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
+    for iAtom in range(AI[0].NAtoms):
+        file.write("  "+AI[0].type[iAtom]+"(1)\t"+str(AI[0].coord[iAtom][0])+"\t"+str(AI[0].coord[iAtom][1])+"\t"+str(AI[0].coord[iAtom][2])+"\n")
     file.write("*\n\n\n")    
     file.close()
 
@@ -78,18 +78,24 @@ class GenerateInput(object):
     for irval in rval:
         Crval += str(irval) + " " 
     Crval += "]" 
-    file.write("\tr "+Crval+";"+"\n")
+    file.write("\tr "+Crval+";\n")
     file.write("end\n")
     file.write("coords\n")
     
     # dimer position
     # Molecule 1
-    for i in range(AI.NAtoms):
-        file.write("  "+AI.type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
+    for iAtom in range(AI[0].NAtoms):
+        file.write("  "+AI[0].type[iAtom]+"(1)\t"\
+        +str(AI[0].coord[iAtom][0])+"\t"\
+        +str(AI[0].coord[iAtom][1])+"\t"\
+        +str(AI[0].coord[iAtom][2])+"\n")
         
     # Molecule 2
-    for i in range(AI.NAtoms):
-        file.write("  "+AI.type[i]+"(2)\t"+str(AI[1].coord[i][0])+"+{r}"+"\t"+str(AI[1].coord[i][1])+"\t"+str(AI[1].coord[i][2])+"\n")
+    for iAtom in range(AI[1].NAtoms):
+        file.write("  "+AI[1].type[iAtom]+"(2)\t"\
+        +str(AI[1].coord[iAtom][0])+"\t"\
+        +"{"+ str(AI[1].coord[iAtom][1]) +"+r}\t"\
+        +str(AI[1].coord[iAtom][2])+"\n")
 
     file.write("end\n")
     file.write("end\n")
@@ -102,7 +108,7 @@ class GenerateInput(object):
 # collection of functions to get SAFT parameters out, and 
 # sigma, epsilon -> Vol and m -> lambdas 
 # write this as a class? or a separate python file?
-class GetSAFTParameters(object):
+# class GetSAFTParameters(object):
 
 # function for running ORCA
 def RunORCA(InputFile, mode = "single", \
@@ -239,7 +245,7 @@ class ORCA_SAFT(object):
     file.write("Charge\t0\n")
     file.write("Mult\t1\n")
     file.write("pardef\n")
-    file.write("\tr = "str(0.95*r0)+", "+str(2*r0)+", "+str(int(50))+";"+"\n")
+    file.write("\tr = "+str(0.95*r0)+", "+str(2*r0)+", "+str(int(50))+";"+"\n")
     file.write("end\n")
     file.write("coords\n")
     
@@ -463,16 +469,16 @@ class AtomInfo(object):
     UVec12 = [self.UnitVector(self.coord[1]), self.UnitVector(self.coord[2])]
     if config == "A":
         # the first and initial orientation, A (CH4 as an example) 
-        #    H2                  y        
+        #    H2                  z        
         #     \                  ^       
         #      \                 |       
         #       \                |    
-        #       .C------- H1     |----->x
+        #       .C------- H1     |----->y
         #     .'/|              /
         #  H3' / |             V
-        #     /__|             z
+        #     /__|             x
         #      H4             
-        r , rmsd = R.align_vectors([[1.,0.,0.],[-1./3., sin(acos(-1./3.)) , 0.]], UVec12)
+        r , rmsd = R.align_vectors([[0.,1.,0.],[0., -1./3., sin(acos(-1./3.))]], UVec12)
 
     elif config == "B":
         # Orientation B (CH4 as an example)
@@ -485,7 +491,7 @@ class AtomInfo(object):
         #      / 
         #     /
         #    H2
-        r , rmsd = R.align_vectors([[1.,0.,0.],[-1./3.,-sin(acos(-1./3.)) , 0.]], UVec12)
+        r , rmsd = R.align_vectors([[0.,1.,0.],[0., -1./3.,-sin(acos(-1./3.))]], UVec12)
 
     elif config == "C":
         # Orientation C (CH4 as an example)
@@ -498,7 +504,7 @@ class AtomInfo(object):
         #            | \ 'H4
         #            |__\
         #             H3
-        r , rmsd = R.align_vectors([[-1.,0.,0.],[1./3.,sin(acos(-1./3.)) , 0.]], UVec12)
+        r , rmsd = R.align_vectors([[0.,-1.,0.],[0., 1./3.,sin(acos(-1./3.))]], UVec12)
 
     elif config == "D":
         # Orientation D (CH4 as an example)
@@ -511,7 +517,7 @@ class AtomInfo(object):
         #              \ 
         #               \
         #                H2
-        r , rmsd = R.align_vectors([[-1.,0.,0.],[1./3.,-sin(acos(-1./3.)) , 0.]], UVec12)
+        r , rmsd = R.align_vectors([[0.,-1.,0.],[0., 1./3.,-sin(acos(-1./3.))]], UVec12)
     
     elif config == "E":
         # Orientation E (CH4 as an example)
@@ -524,8 +530,8 @@ class AtomInfo(object):
         #      /        ¯`
         #     /
         #    H2
-        r , rmsd = R.align_vectors([[-cos(acos(-1./3.)/2.),  sin(acos(-1./3.)/2.), 0.],\
-                                    [-cos(acos(-1./3.)/2.), -sin(acos(-1./3.)/2.), 0.]], UVec12)
+        r , rmsd = R.align_vectors([[0., -cos(acos(-1./3.)/2.),  sin(acos(-1./3.)/2.)],\
+                                    [0., -cos(acos(-1./3.)/2.), -sin(acos(-1./3.)/2.)]], UVec12)
 
     elif config == "F":
         # Orientation F (CH4 as an example)
@@ -538,8 +544,8 @@ class AtomInfo(object):
         #    '¯        \ 
         #               \
         #                H2
-        r , rmsd = R.align_vectors([[cos(acos(-1./3.)/2.), sin(acos(-1./3.)/2.), 0.],\
-                                    [cos(acos(-1./3.)/2.),-sin(acos(-1./3.)/2.), 0.]], UVec12)
+        r , rmsd = R.align_vectors([[0., cos(acos(-1./3.)/2.), sin(acos(-1./3.)/2.)],\
+                                    [0., cos(acos(-1./3.)/2.),-sin(acos(-1./3.)/2.)]], UVec12)
     else:
         raise Exception("config must be A or B or C or D or E or F")
 
