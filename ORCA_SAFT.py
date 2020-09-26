@@ -13,7 +13,7 @@ from copy import deepcopy
 # for different purposes, e.g. single molecule, dimer with different 
 # orientations and else 
 class GenerateInput(object):
- def __init__(self,smiles,method="HFLD_pVDZ.txt",path_multiwfn="multiwfn", path_orca="orca"):
+ def __init__(self,smiles,method="HFLD_pVDZ.txt",path_multiwfn="multiwfn"):
     
     # Create a Molecule object in pybel
     mol = pybel.readstring("smi",smiles)
@@ -23,7 +23,6 @@ class GenerateInput(object):
 
     self.smiles = smiles
     self.method = method
-    self.path_orca = path_orca
     self.path_multiwfn = path_multiwfn
     self.AtomInfo = []
     self.AtomInfo.append(deepcopy(AtomInfo(mol)))
@@ -40,7 +39,7 @@ class GenerateInput(object):
             file.write(lines[i]+"\n")
 
     if mode == "parallel":
-        file.write("%pal nprocs "+str(int(ncpus))+"\n")
+        file.write("%pal nprocs "+str(int(ncpus))+" end\n")
 
     file.write("\n")
 
@@ -66,7 +65,7 @@ class GenerateInput(object):
             file.write(lines[i]+"\n")
 
     if mode == "parallel":
-        file.write("%pal nprocs "+str(int(ncpus))+"\n")
+        file.write("%pal nprocs "+str(int(ncpus))+" end\n")
     
     file.write("\n")
     file.write("%coords\n")
@@ -123,18 +122,45 @@ def RunORCA(InputFile, mode = "single", \
         print("qsub "+PBSName)
         subprocess.run("qsub "+PBSName, shell=True)
 
+# function for cleaning unnecessary temporary ORCA files
+def CleanTemp(smiles):
+    # Remove files that aren't necessary
+    for filename in glob.glob("./*"):
+        if smiles == filename.split("_")[0]:
+            matches = [".pbs", ".o", ".e", ".out", ".inp"]
+        	# Don't remove pbs, HPC output, error, ORCA input and output files
+            if not any(CFormat in filename for CFormat in matches):
+                os.remove(filename)
+
+# function for cleaning unnecessary output and error message from HPC
+def CleanOE(smiles):
+    # Remove files that aren't necessary
+    for filename in glob.glob("./*"):
+        if smiles == filename.split("_")[0][2:]:
+            matches = [".o", ".e"]
+        	# remove HPC output and error files
+            if any(CFormat in filename for CFormat in matches):
+                os.remove(filename)
+
 # function for generating PBS file for submitting HPC job
 def GeneratePBS(*, InputFile, hour, minute, node, mem, ncpus, env, path_orca):
     PBSName = InputFile.split(".")[0]+".pbs"
     if os.path.exists(PBSName):
         os.remove(PBSName)
     file = open(PBSName,"w")
-    file.write("PBS -l walltime="+str(int(hour))+":"+str(int(minute))+":00\n")
-    file.write("PBS -l select="+str(int(node))+":ncpus="+str(int(ncpus))+":mem="+str(int(mem))+"gb:mpiprocs="+str(int(ncpus))+"\n")         
+    if hour < 10:
+        file.write("#PBS -l walltime=0"+str(int(hour))+":"+str(int(minute))+":00\n")
+    elif hour > 10:
+    	file.write("#PBS -l walltime=0"+str(int(hour))+":"+str(int(minute))+":00\n")
+    file.write("#PBS -l select="+str(int(node))+":ncpus="+str(int(ncpus))+":mem="+str(int(mem))+"gb:mpiprocs="+str(int(ncpus))+"\n")  
+    file.write("\n")       
     file.write("module load anaconda3/personal\n")
     file.write("source activate "+env+"\n")
     file.write("export OMPI_MCA_btl=self,vader,tcp\n")
-    file.write("path_orca"+" "+InputFile+">"+InputFile.split(".")[0]+".out\n")
+    file.write("\n")
+    file.write('cd "$PBS_O_WORKDIR" \n')
+    file.write(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out\n")
+    file.write("\n")
     file.write("conda deactivate\n")
     file.close()
     return PBSName
