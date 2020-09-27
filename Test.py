@@ -1,19 +1,23 @@
-from ORCA_SAFT import ORCA_SAFT
+from ORCA_SAFT import GenerateInput, RunORCA, CleanTemp, CleanOE, GeneratePBS, ReadPES
 
-# Initialise the ORCA_SAFT module by specifying a smiles and method txt.
-# The method txt file should contain all the necessary settings. 
-# pVDZ, pVTZ, pVQZ, pV5Z and pV6Z are all available
-r = ORCA_SAFT("C",method="HFLD_pVDZ.txt",path_orca="orca")
+# smiles = "[Ar]"
+# r_0 = 3.5
+# rint = (2-0.95)/49
+# rval = [2*r_0 - rint*r_0*i for i in range(50)]
+Nr = 50
 
-# test new functions
+# # generate input file by first initiallizing a GenerateInput class, with the desired SMILES representation molecule
+# # and methods. The method txt file should contain all the necessary settings. 
+# # pVDZ, pVTZ, pVQZ, pV5Z and pV6Z are all available
+# GI = GenerateInput(smiles, method="HFLD_pVDZ.txt")
 
-# Obtain the SAFT parameters from QC calculations
-# r.SAFT_Params()
+# # get input for pure single molecule
+# GI.InputDimer(rval, mode = "parallel", suffix = "dimer", ncpus = 8, group = None, ori = None)
 
-# Plot the resulting potentials (must run SAFT_Params prior to this)
-# r.Plotting()
+# # run ORCA in parallel mode
+# RunORCA(smiles+"_dimer.inp", mode = "parallel", hour = 0, minute = 30, node = 1, mem = 16, ncpus = 8,
+# env = "abinitioSAFT", path_orca = "../../../orca_4_2_1_linux_x86-64_openmpi314/orca")
 
-# Clean will remove any undesirable files from the repository
-# r.Clean()
-
-# r.MolVol()
+# ReadPES(Nr = Nr, OutputFile = "[Ar]_dimer.out", EnergyType = "MDCI energy")
+CleanOE("[Ar]")
+CleanTemp("[Ar]")

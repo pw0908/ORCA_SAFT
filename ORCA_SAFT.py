@@ -27,7 +27,8 @@ class GenerateInput(object):
     self.AtomInfo = []
     self.AtomInfo.append(deepcopy(AtomInfo(mol)))
     self.AtomInfo.append(deepcopy(AtomInfo(mol)))
-
+ 
+ # generate calculation for single molecule
  def InputPure(self, mode = "single", suffix = "pure", ncpus = 8):
     AI = self.AtomInfo
     if os.path.exists(self.smiles+"_"+suffix+".inp"):
@@ -37,12 +38,14 @@ class GenerateInput(object):
         lines = f.read().split("\n")
         for i in range(len(lines)):
             file.write(lines[i]+"\n")
-
+    
+    # processor number
     if mode == "parallel":
         file.write("%pal nprocs "+str(int(ncpus))+" end\n")
 
     file.write("\n")
-
+    
+    # coordinates from AtomInfo
     file.write("* xyz 0 1\n")
     for iAtom in range(AI[0].NAtoms):
         file.write("  "+AI[0].type[iAtom]+"(1)\t"+str(AI[0].coord[iAtom][0])+"\t"+str(AI[0].coord[iAtom][1])+"\t"+str(AI[0].coord[iAtom][2])+"\n")
@@ -51,14 +54,18 @@ class GenerateInput(object):
 
  def InputDimer(self, rval, mode = "single", suffix = "dimer", ncpus = 8, group = None, ori = None):
     AI = self.AtomInfo
+    # so far considered only Td geometry 
     if group == "Td":
         AI[0].TdOrient(ori[0])
         AI[1].TdOrient(ori[1])
+    # possibly write a function in future to systematically check the two-body orientations in a 
+    # systematic way.
     else:
         pass
     if os.path.exists(self.smiles+"_"+suffix+".inp"):
         os.remove(self.smiles+"_"+suffix+".inp")
     file = open(self.smiles+"_"+suffix+".inp","w")
+    # preset methods
     with open(self.method) as f:
         lines = f.read().split("\n")
         for i in range(len(lines)):
@@ -67,11 +74,13 @@ class GenerateInput(object):
     if mode == "parallel":
         file.write("%pal nprocs "+str(int(ncpus))+" end\n")
     
+    # coords block
     file.write("\n")
     file.write("%coords\n")
     file.write("CTyp\txyz\n")
     file.write("Charge\t0\n")
     file.write("Mult\t1\n")
+    # define parameters for varied r
     file.write("pardef\n")
     Crval = "["
     for irval in rval:
@@ -98,6 +107,7 @@ class GenerateInput(object):
 
     file.write("end\n")
     file.write("end\n")
+    # use the MOs generated in the last iteration
     file.write("%method\n")
     file.write("ScanGuess MORead\n")
     file.write("end\n")
@@ -107,64 +117,283 @@ class GenerateInput(object):
 # collection of functions to get SAFT parameters out, and 
 # sigma, epsilon -> Vol and m -> lambdas 
 # write this as a class? or a separate python file?
-# class GetSAFTParameters(object):
+class GetSAFTParameters(object):
+ def __init__(self):
+    pass 	
 
-# function for running ORCA
+# function for running ORCA, default is single mode
+# for the meaning of the kwargs, see GeneratePBS() function
 def RunORCA(InputFile, mode = "single", \
  hour = 0, minute = 30, node = 1, mem = 16, ncpus = 8, env = "abinitioSAFT", path_orca = "orca"):
     if mode == "single":
+        # just run orca
         print(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out")
         subprocess.run(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out", shell=True)
     if mode == "parallel":
+        # check if the path typed in is the full orca path
         if path_orca == "orca":
             raise Exception("Exact orca path need to be specified")
+        # generate PBS file, and get PBS file name
         PBSName = GeneratePBS(InputFile=InputFile,hour=hour,minute=minute,node=node,mem=mem,ncpus=ncpus,env=env,path_orca=path_orca)
         print("qsub "+PBSName)
         subprocess.run("qsub "+PBSName, shell=True)
 
 # function for cleaning unnecessary temporary ORCA files
 def CleanTemp(smiles):
-    # Remove files that aren't necessary
+    matches = [".pbs", ".o", ".e", ".out", ".inp", ".pes"]
     for filename in glob.glob("./*"):
-        if smiles == filename.split("_")[0]:
-            matches = [".pbs", ".o", ".e", ".out", ".inp"]
-        	# Don't remove pbs, HPC output, error, ORCA input and output files
-            if not any(CFormat in filename for CFormat in matches):
-                os.remove(filename)
+        # only clean files with the specified SMILES, prevent the case that specifies "C", but clean files such as "CC"
+        if smiles in filename:
+            if smiles in {filename.split("_")[0][2:], filename.split("_")[1]}:
+        	    # Don't remove pbs, potential energy surface, HPC output, error, ORCA input and output files
+                if not any(CFormat in filename for CFormat in matches):
+                    os.remove(filename)
 
 # function for cleaning unnecessary output and error message from HPC
 def CleanOE(smiles):
     # Remove files that aren't necessary
     for filename in glob.glob("./*"):
-        if smiles == filename.split("_")[0][2:]:
-            matches = [".o", ".e"]
-        	# remove HPC output and error files
-            if any(CFormat in filename for CFormat in matches):
-                os.remove(filename)
+        # only clean files with the specified SMILES, prevent the case that specifies "C", but clean files such as "CC"
+        if smiles in filename:
+            if smiles in {filename.split("_")[0][2:], filename.split("_")[1]}:
+                matches = [".o", ".e"]
+        	    # remove HPC output and error files
+                if any(CFormat in filename for CFormat in matches):
+                    os.remove(filename)
 
 # function for generating PBS file for submitting HPC job
+# hour, minute: HPC machine time
+# node, mem, ncpus: # of node, memory size (in GB) and # of cpus (also equal to processors)
+# env: anaconda3 environment for running ORCA
+# path_orca: orca path, need to be the full path, but relative path (../ and ./) is acceptable
 def GeneratePBS(*, InputFile, hour, minute, node, mem, ncpus, env, path_orca):
-    PBSName = InputFile.split(".")[0]+".pbs"
+    # extract PBS name from the input ORCA file
+    PBSName = "ORCA_"+InputFile.split(".")[0]+".pbs"
     if os.path.exists(PBSName):
         os.remove(PBSName)
     file = open(PBSName,"w")
+    # wall time need to be in HH:MM:SS
     if hour < 10:
         file.write("#PBS -l walltime=0"+str(int(hour))+":"+str(int(minute))+":00\n")
     elif hour > 10:
     	file.write("#PBS -l walltime=0"+str(int(hour))+":"+str(int(minute))+":00\n")
+    # resource request
     file.write("#PBS -l select="+str(int(node))+":ncpus="+str(int(ncpus))+":mem="+str(int(mem))+"gb:mpiprocs="+str(int(ncpus))+"\n")  
     file.write("\n")       
+    # activate anaconda3 and the environment
     file.write("module load anaconda3/personal\n")
     file.write("source activate "+env+"\n")
+    # need to set an environment variable of OpenMPI
     file.write("export OMPI_MCA_btl=self,vader,tcp\n")
     file.write("\n")
+    # the job submitted will be sent to another location to be run, so if we want to access to
+    # some locations in home directory, cd to $PBS_O_WORKDIR is needed
     file.write('cd "$PBS_O_WORKDIR" \n')
+    # call ORCA to run the input script
     file.write(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out\n")
     file.write("\n")
+    # deactivate the environment in the end
     file.write("conda deactivate\n")
     file.close()
     return PBSName
 
+# read the potential energy surface (PES) data from the output file as specified in OutputFile
+# Nr: the # of r calculated
+# EnergyType: in some calculations, there are different types of energies, for HFLD, there are
+# "'Actual Energy'", "SCF Energy" and "MDCI Energy". The "'Actual Energy'" is the same as 
+# "SCF Energy", but they are not the energy we are looking for. We need "MDCI Energy" because
+# the CI part between the two fragments are added to the SCF energy. 
+def ReadPES(*, Nr, OutputFile, EnergyType):
+    # generate PES file name, in .pes
+    PESFile = OutputFile.split(".out")[0]+"_PES.pes"
+    # a list of PES values
+    PESList = []
+    with open(OutputFile,"r") as f:
+        lines = f.read().split("\n")
+        for iLine,line in enumerate(lines):
+            # find the correct line for PES data
+            if "The Calculated Surface using the "+EnergyType in line:
+                EnergyLine = iLine
+        # extract the values
+        for iLine in range(EnergyLine+1, EnergyLine+1+Nr):
+            PESList.append([lines[iLine].split(" ")[-2], lines[iLine].split(" ")[-1]])
+        # convert them into float
+        PESList = [[float(i) for i in j] for j in PESList]
+    if os.path.exists(PESFile):
+        os.remove(PESFile)
+    file = open(PESFile,"w")
+    # header
+    file.write("# Potential Energy Surface data\n")
+    file.write("# r/A Energy/Hartree \n")
+    # write value out
+    for iLine in range(Nr):
+        file.write(str(PESList[iLine][0])+" "+str(PESList[iLine][1])+"\n")
+    return PESList
+
+class AtomInfo(object):
+ # get a list of atom types and coords
+ def __init__(self, mol):
+    mol.make3D()
+    self.type   = [] 
+    self.coord  = []
+    self.mass   = []
+    self.M      = 0.
+    self.NAtoms = len(mol.atoms)
+    for iAtom in range(self.NAtoms):
+        atom = mol.atoms[iAtom]
+        self.type.append(atom.type.split("3")[0])
+        x = atom.coords[0]
+        y = atom.coords[1]
+        z = atom.coords[2]
+        self.coord.append([x,y,z])
+        self.mass.append(atom.atomicmass)
+        self.M += atom.atomicmass
+    self.GetCoM()
+    self.SetCoMOrigin()
+
+ def GetCoM(self):
+    # get center of mass
+    moment = [0., 0., 0.]
+    for iAtom in range(len(self.type)):
+        for jCoord in range(3):
+            moment[jCoord] += self.coord[iAtom][jCoord]*self.mass[iAtom]
+    self.CoM = [iMoment / self.M for iMoment in moment]
+
+ def SetCoMOrigin(self):
+    # set the molecule center of mass to the origin 
+    for iAtom in range(len(self.type)):
+        for jCoord in range(3):
+            self.coord[iAtom][jCoord] -= self.CoM[jCoord]
+
+ def SetCenterOrigin(self):
+    # for tetragonal point group Td only, set the center atom to be at the origin
+    # using SetToOrigin() based on CoM gives the center coordinate a tiny displacement from origin
+    atom_center = self.coord[0].copy()
+    for iAtom in range(len(self.type)):
+        for jCoord in range(3):
+            self.coord[iAtom][jCoord] -= atom_center[jCoord]
+
+ def UnitVector(self, vector):
+    # get a unit vector from a given vector
+    length = self.Length(vector)
+    unitvector = [iVector / length for iVector in vector]
+    return unitvector 
+ 
+ def Length(self, vector):
+    # get the length of the vector
+    length = sqrt( sum(iVector*iVector for iVector in vector) )
+    return length
+
+ def Reflection(self, axis):
+    # reflection about the plane that is perpandicular to the given axis and contains the origin
+    for iAtom in range(len(self.type)):
+        if axis == "x":
+            self.coord[0] = -self.coord[0]
+        if axis == "y":
+            self.coord[1] = -self.coord[1]
+        if axis == "z":
+            self.coord[2] = -self.coord[2]
+
+ def TdOrient(self, config = "A"):
+    self.SetCenterOrigin()
+    UVec12 = [self.UnitVector(self.coord[1]), self.UnitVector(self.coord[2])]
+    if config == "A":
+        # the first and initial orientation, A (CH4 as an example) 
+        #    H2                  z        
+        #     \                  ^       
+        #      \                 |       
+        #       \                |    
+        #       .C------- H1     |----->y
+        #     .'/|              /
+        #  H3' / |             V
+        #     /__|             x
+        #      H4             
+        r , rmsd = R.align_vectors([[0.,1.,0.],[0., -1./3., sin(acos(-1./3.))]], UVec12)
+
+    elif config == "B":
+        # Orientation B (CH4 as an example)
+        #      H3                                 
+        #     \¯¯|          
+        #  H4. \ |           
+        #     '.\|          
+        #       'C------- H1
+        #       /
+        #      / 
+        #     /
+        #    H2
+        r , rmsd = R.align_vectors([[0.,1.,0.],[0., -1./3.,-sin(acos(-1./3.))]], UVec12)
+
+    elif config == "C":
+        # Orientation C (CH4 as an example)
+        #                H2
+        #               /
+        #              /
+        #             /
+        #  H1 -------C.
+        #            |\'.
+        #            | \ 'H4
+        #            |__\
+        #             H3
+        r , rmsd = R.align_vectors([[0.,-1.,0.],[0., 1./3.,sin(acos(-1./3.))]], UVec12)
+
+    elif config == "D":
+        # Orientation D (CH4 as an example)
+        #             H4
+        #            |¯¯/
+        #            | / .H3
+        #            |/.'
+        #  H1 -------C'
+        #             \
+        #              \ 
+        #               \
+        #                H2
+        r , rmsd = R.align_vectors([[0.,-1.,0.],[0., 1./3.,-sin(acos(-1./3.))]], UVec12)
+    
+    elif config == "E":
+        # Orientation E (CH4 as an example)
+        #    H1
+        #     \
+        #      \       
+        #       \ ,,.--'' H3
+        #        C________
+        #       / ¯`-.__ | H4
+        #      /        ¯`
+        #     /
+        #    H2
+        r , rmsd = R.align_vectors([[0., -cos(acos(-1./3.)/2.),  sin(acos(-1./3.)/2.)],\
+                                    [0., -cos(acos(-1./3.)/2.), -sin(acos(-1./3.)/2.)]], UVec12)
+
+    elif config == "F":
+        # Orientation F (CH4 as an example)
+        #                H1
+        #               /
+        #              /    
+        #  H4 ''--... /
+        #    ________C
+        # H3 | __.-'¯ \
+        #    '¯        \ 
+        #               \
+        #                H2
+        r , rmsd = R.align_vectors([[0., cos(acos(-1./3.)/2.), sin(acos(-1./3.)/2.)],\
+                                    [0., cos(acos(-1./3.)/2.),-sin(acos(-1./3.)/2.)]], UVec12)
+    else:
+        raise Exception("config must be A or B or C or D or E or F")
+
+    for iAtom in range(len(self.type)):
+        self.coord[iAtom] = r.apply(self.coord[iAtom]) 
+
+class const(object):
+    # useful constants
+    def __init__(self):
+        # ORCA 4.2.1 manual
+        self.Hartree2eV = 27.2113834
+        # NIST CODATA 2018
+        self.eV2K       = 1.160451812e4
+        self.Hartree2K  = self.Hartree2eV*self.eV2K
+        # ORCA 4.2.1 manual
+        self.Bohr2A     = 0.5291772083
+        # Boltzmann in eV
+        self.Boltzmann  = 8.617333262e-5
 
 #--------------------------------------------------------------
 # Old ORCA_SAFT class
@@ -426,167 +655,3 @@ class ORCA_SAFT(object):
 # old ORCA_SAFT class end
 # ---------------------------------------------------------------
 
-class AtomInfo(object):
- # get a list of atom types and coords
- def __init__(self, mol):
-    mol.make3D()
-    self.type   = [] 
-    self.coord  = []
-    self.mass   = []
-    self.M      = 0.
-    self.NAtoms = len(mol.atoms)
-    for iAtom in range(self.NAtoms):
-        atom = mol.atoms[iAtom]
-        self.type.append(atom.type.split("3")[0])
-        x = atom.coords[0]
-        y = atom.coords[1]
-        z = atom.coords[2]
-        self.coord.append([x,y,z])
-        self.mass.append(atom.atomicmass)
-        self.M += atom.atomicmass
-    self.GetCoM()
-    self.SetCoMOrigin()
-
- def GetCoM(self):
-    # get center of mass
-    moment = [0., 0., 0.]
-    for iAtom in range(len(self.type)):
-        for jCoord in range(3):
-            moment[jCoord] += self.coord[iAtom][jCoord]*self.mass[iAtom]
-    self.CoM = [iMoment / self.M for iMoment in moment]
-
- def SetCoMOrigin(self):
-    # set the molecule center of mass to the origin 
-    for iAtom in range(len(self.type)):
-        for jCoord in range(3):
-            self.coord[iAtom][jCoord] -= self.CoM[jCoord]
-
- def SetCenterOrigin(self):
-    # for tetragonal point group Td only, set the center atom to be at the origin
-    # using SetToOrigin() based on CoM gives the center coordinate a tiny displacement from origin
-    atom_center = self.coord[0].copy()
-    for iAtom in range(len(self.type)):
-        for jCoord in range(3):
-            self.coord[iAtom][jCoord] -= atom_center[jCoord]
-
- def UnitVector(self, vector):
-    # get a unit vector from a given vector
-    length = self.Length(vector)
-    unitvector = [iVector / length for iVector in vector]
-    return unitvector 
- 
- def Length(self, vector):
-    # get the length of the vector
-    length = sqrt( sum(iVector*iVector for iVector in vector) )
-    return length
-
- def Reflection(self, axis):
-    # reflection about the plane that is perpandicular to the given axis and contains the origin
-    for iAtom in range(len(self.type)):
-        if axis == "x":
-            self.coord[0] = -self.coord[0]
-        if axis == "y":
-            self.coord[1] = -self.coord[1]
-        if axis == "z":
-            self.coord[2] = -self.coord[2]
-
- def TdOrient(self, config = "A"):
-    self.SetCenterOrigin()
-    UVec12 = [self.UnitVector(self.coord[1]), self.UnitVector(self.coord[2])]
-    if config == "A":
-        # the first and initial orientation, A (CH4 as an example) 
-        #    H2                  z        
-        #     \                  ^       
-        #      \                 |       
-        #       \                |    
-        #       .C------- H1     |----->y
-        #     .'/|              /
-        #  H3' / |             V
-        #     /__|             x
-        #      H4             
-        r , rmsd = R.align_vectors([[0.,1.,0.],[0., -1./3., sin(acos(-1./3.))]], UVec12)
-
-    elif config == "B":
-        # Orientation B (CH4 as an example)
-        #      H3                                 
-        #     \¯¯|          
-        #  H4. \ |           
-        #     '.\|          
-        #       'C------- H1
-        #       /
-        #      / 
-        #     /
-        #    H2
-        r , rmsd = R.align_vectors([[0.,1.,0.],[0., -1./3.,-sin(acos(-1./3.))]], UVec12)
-
-    elif config == "C":
-        # Orientation C (CH4 as an example)
-        #                H2
-        #               /
-        #              /
-        #             /
-        #  H1 -------C.
-        #            |\'.
-        #            | \ 'H4
-        #            |__\
-        #             H3
-        r , rmsd = R.align_vectors([[0.,-1.,0.],[0., 1./3.,sin(acos(-1./3.))]], UVec12)
-
-    elif config == "D":
-        # Orientation D (CH4 as an example)
-        #             H4
-        #            |¯¯/
-        #            | / .H3
-        #            |/.'
-        #  H1 -------C'
-        #             \
-        #              \ 
-        #               \
-        #                H2
-        r , rmsd = R.align_vectors([[0.,-1.,0.],[0., 1./3.,-sin(acos(-1./3.))]], UVec12)
-    
-    elif config == "E":
-        # Orientation E (CH4 as an example)
-        #    H1
-        #     \
-        #      \       
-        #       \ ,,.--'' H3
-        #        C________
-        #       / ¯`-.__ | H4
-        #      /        ¯`
-        #     /
-        #    H2
-        r , rmsd = R.align_vectors([[0., -cos(acos(-1./3.)/2.),  sin(acos(-1./3.)/2.)],\
-                                    [0., -cos(acos(-1./3.)/2.), -sin(acos(-1./3.)/2.)]], UVec12)
-
-    elif config == "F":
-        # Orientation F (CH4 as an example)
-        #                H1
-        #               /
-        #              /    
-        #  H4 ''--... /
-        #    ________C
-        # H3 | __.-'¯ \
-        #    '¯        \ 
-        #               \
-        #                H2
-        r , rmsd = R.align_vectors([[0., cos(acos(-1./3.)/2.), sin(acos(-1./3.)/2.)],\
-                                    [0., cos(acos(-1./3.)/2.),-sin(acos(-1./3.)/2.)]], UVec12)
-    else:
-        raise Exception("config must be A or B or C or D or E or F")
-
-    for iAtom in range(len(self.type)):
-        self.coord[iAtom] = r.apply(self.coord[iAtom]) 
-
-class const(object):
-    # useful constants
-    def __init__(self):
-        # ORCA 4.2.1 manual
-        self.Hartree2eV = 27.2113834
-        # NIST CODATA 2018
-        self.eV2K       = 1.160451812e4
-        self.Hartree2K  = self.Hartree2eV*self.eV2K
-        # ORCA 4.2.1 manual
-        self.Bohr2A     = 0.5291772083
-        # Boltzmann in eV
-        self.Boltzmann  = 8.617333262e-5
