@@ -230,6 +230,28 @@ def ReadPES(*, Nr, OutputFile, EnergyType):
         file.write(str(PESList[iLine][0])+" "+str(PESList[iLine][1])+"\n")
     return PESList
 
+# Read single point energy, can only be used for single point energy calculation (N/A for PES calculation)
+def ReadSPE(OutputFile):
+    # generate SPE file name, in .spe
+    SPEFile = OutputFile.split(".out")[0]+"_SPE.spe"
+    with open(OutputFile,"r") as f:
+            lines = f.read().split("\n")
+            for i,line in enumerate(lines):
+                if "FINAL SINGLE POINT ENERGY" in line:
+                    words =line.split()
+                    if len(words)>6:
+                        SPE = float(words[6])
+                    else:
+                        SPE = float(words[4])
+    if os.path.exists(SPEFile):
+        os.remove(SPEFile)
+    file = open(SPEFile,"w")
+    # header
+    file.write("# Single point energy data\n")
+    file.write("# Energy/Hartree \n")
+    fil.write(str(SPE)+"\n")
+    return SPE
+
 class AtomInfo(object):
  # get a list of atom types and coords
  def __init__(self, mol):
