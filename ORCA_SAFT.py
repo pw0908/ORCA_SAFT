@@ -140,12 +140,12 @@ def RunORCA(InputFile, mode = "single", \
 
 # function for cleaning unnecessary temporary ORCA files
 def CleanTemp(smiles):
-    matches = [".pbs", ".o", ".e", ".out", ".inp", ".pes"]
+    matches = [".pbs", ".o", ".e", ".out", ".inp", ".pes", ".spe"]
     for filename in glob.glob("./*"):
         # only clean files with the specified SMILES, prevent the case that specifies "C", but clean files such as "CC"
         if smiles in filename:
             if smiles in {filename.split("_")[0][2:], filename.split("_")[1]}:
-        	    # Don't remove pbs, potential energy surface, HPC output, error, ORCA input and output files
+        	    # Don't remove pbs, potential energy surface, single point energy, HPC output, error, ORCA input and output files
                 if not any(CFormat in filename for CFormat in matches):
                     os.remove(filename)
 
