@@ -13,7 +13,7 @@ from copy import deepcopy
 # for different purposes, e.g. single molecule, dimer with different 
 # orientations and else 
 class GenerateInput(object):
- def __init__(self,smiles,method="HFLD_pVDZ.txt",path_multiwfn="multiwfn"):
+ def __init__(self,smiles,method="HFLD_pVDZ",path_multiwfn="multiwfn"):
     
     # Create a Molecule object in pybel
     mol = pybel.readstring("smi",smiles)
@@ -29,19 +29,24 @@ class GenerateInput(object):
     self.AtomInfo.append(deepcopy(AtomInfo(mol)))
  
  # generate calculation for single molecule
- def InputPure(self, mode = "single", suffix = "pure", ncpus = 8):
+ def InputPure(self, mode = "single", suffix = "pure", ncpus = 8, orcaproc = None):
+    if orcaproc is None:
+        nprocs = ncpus
+    else:
+        nprocs = orcaproc
     AI = self.AtomInfo
-    if os.path.exists(self.smiles+"_"+suffix+".inp"):
-        os.remove(self.smiles+"_"+suffix+".inp")
-    file = open(self.smiles+"_"+suffix+".inp","w")
-    with open(self.method) as f:
+    PureFileName = self.smiles+"_"+suffix+"_"+self.method+".inp"
+    if os.path.exists(PureFileName):
+        os.remove(PureFileName)
+    file = open(PureFileName,"w")
+    with open(self.method+".txt") as f:
         lines = f.read().split("\n")
         for i in range(len(lines)):
             file.write(lines[i]+"\n")
     
     # processor number
     if mode == "parallel":
-        file.write("%pal nprocs "+str(int(ncpus))+" end\n")
+        file.write("%pal nprocs "+str(int(nprocs))+" end\n")
 
     file.write("\n")
     
@@ -52,7 +57,11 @@ class GenerateInput(object):
     file.write("*\n\n\n")    
     file.close()
 
- def InputDimer(self, rval, mode = "single", suffix = "dimer", ncpus = 8, group = None, ori = None):
+ def InputDimer(self, rval, mode = "single", suffix = "dimer", ncpus = 8, group = None, ori = None, orcaproc = None):
+    if orcaproc is None:
+        nprocs = ncpus
+    else:
+        nprocs = orcaproc
     AI = self.AtomInfo
     # so far considered only Td geometry 
     if group == "Td":
@@ -62,17 +71,21 @@ class GenerateInput(object):
     # systematic way.
     else:
         pass
-    if os.path.exists(self.smiles+"_"+suffix+".inp"):
-        os.remove(self.smiles+"_"+suffix+".inp")
-    file = open(self.smiles+"_"+suffix+".inp","w")
+    DimerFileName = self.smiles+"_"+suffix+"_"+self.method
+    if None not in {group, ori}:
+        DimerFileName += ("_"+group+ori)
+    DimerFileName += ".inp"
+    if os.path.exists(DimerFileName):
+        os.remove(DimerFileName)
+    file = open(DimerFileName,"w")
     # preset methods
-    with open(self.method) as f:
+    with open(self.method+".txt") as f:
         lines = f.read().split("\n")
         for i in range(len(lines)):
             file.write(lines[i]+"\n")
 
     if mode == "parallel":
-        file.write("%pal nprocs "+str(int(ncpus))+" end\n")
+        file.write("%pal nprocs "+str(int(nprocs))+" end\n")
     
     # coords block
     file.write("\n")
@@ -82,11 +95,14 @@ class GenerateInput(object):
     file.write("Mult\t1\n")
     # define parameters for varied r
     file.write("pardef\n")
-    Crval = "["
-    for irval in rval:
-        Crval += str(irval) + " " 
-    Crval += "]" 
-    file.write("\tr "+Crval+";\n")
+    if isinstance(rval, float):
+        file.write("\tr = "+str(rval)+";\n")
+    elif isinstance(rval, list):
+        Crval = "["
+        for irval in rval:
+            Crval += str(irval) + " " 
+        Crval += "]" 
+        file.write("\tr "+Crval+";\n")
     file.write("end\n")
     file.write("coords\n")
     
@@ -108,9 +124,10 @@ class GenerateInput(object):
     file.write("end\n")
     file.write("end\n")
     # use the MOs generated in the last iteration
-    file.write("%method\n")
-    file.write("ScanGuess MORead\n")
-    file.write("end\n")
+    if isinstance(rval, list):
+        file.write("%method\n")
+        file.write("ScanGuess MORead\n")
+        file.write("end\n")
     file.write("\n\n\n")    
     file.close()
 
@@ -119,7 +136,7 @@ class GenerateInput(object):
 # write this as a class? or a separate python file?
 class GetSAFTParameters(object):
  def __init__(self):
-    pass 	
+    pass
 
 # function for running ORCA, default is single mode
 # for the meaning of the kwargs, see GeneratePBS() function
@@ -135,8 +152,8 @@ def RunORCA(InputFile, mode = "single", \
             raise Exception("Exact orca path need to be specified")
         # generate PBS file, and get PBS file name
         PBSName = GeneratePBS(InputFile=InputFile,hour=hour,minute=minute,node=node,mem=mem,ncpus=ncpus,env=env,path_orca=path_orca)
-        print("qsub "+PBSName)
-        subprocess.run("qsub "+PBSName, shell=True)
+        print("qsub "+'"'+PBSName+'"')
+        subprocess.run("qsub "+'"'+PBSName+'"', shell=True)
 
 # function for cleaning unnecessary temporary ORCA files
 def CleanTemp(smiles):
@@ -174,14 +191,20 @@ def GeneratePBS(*, InputFile, hour, minute, node, mem, ncpus, env, path_orca):
     file = open(PBSName,"w")
     # wall time need to be in HH:MM:SS
     if hour < 10:
-        file.write("#PBS -l walltime=0"+str(int(hour))+":"+str(int(minute))+":00\n")
+        Chour = "0"+str(int(hour))
     elif hour > 10:
-    	file.write("#PBS -l walltime=0"+str(int(hour))+":"+str(int(minute))+":00\n")
+        Chour = str(int(hour))
+    if minute < 10:
+        Cminute = "0"+str(int(minute))
+    elif minute > 10:
+        Cminute = str(int(minute))
+    file.write("#PBS -l walltime="+Chour+":"+Cminute+":00\n")
     # resource request
     file.write("#PBS -l select="+str(int(node))+":ncpus="+str(int(ncpus))+":mem="+str(int(mem))+"gb:mpiprocs="+str(int(ncpus))+"\n")  
     file.write("\n")       
     # activate anaconda3 and the environment
     file.write("module load anaconda3/personal\n")
+    file.write("module load orca/4.2.1\n")
     file.write("source activate "+env+"\n")
     # need to set an environment variable of OpenMPI
     file.write("export OMPI_MCA_btl=self,vader,tcp\n")
@@ -190,7 +213,7 @@ def GeneratePBS(*, InputFile, hour, minute, node, mem, ncpus, env, path_orca):
     # some locations in home directory, cd to $PBS_O_WORKDIR is needed
     file.write('cd "$PBS_O_WORKDIR" \n')
     # call ORCA to run the input script
-    file.write(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out\n")
+    file.write('"'+path_orca+'"'+" "+'"'+InputFile+'"'+">"+'"'+InputFile.split(".")[0]+".out"+'"'+"\n")
     file.write("\n")
     # deactivate the environment in the end
     file.write("conda deactivate\n")
@@ -203,22 +226,37 @@ def GeneratePBS(*, InputFile, hour, minute, node, mem, ncpus, env, path_orca):
 # "'Actual Energy'", "SCF Energy" and "MDCI Energy". The "'Actual Energy'" is the same as 
 # "SCF Energy", but they are not the energy we are looking for. We need "MDCI Energy" because
 # the CI part between the two fragments are added to the SCF energy. 
-def ReadPES(*, Nr, OutputFile, EnergyType):
+def ReadPES(*, Nr, OutputFile):
     # generate PES file name, in .pes
     PESFile = OutputFile.split(".out")[0]+"_PES.pes"
     # a list of PES values
+    rList = []
     PESList = []
+    iPES = 0
+    ir = 0
     with open(OutputFile,"r") as f:
         lines = f.read().split("\n")
         for iLine,line in enumerate(lines):
             # find the correct line for PES data
-            if "The Calculated Surface using the "+EnergyType in line:
-                EnergyLine = iLine
-        # extract the values
-        for iLine in range(EnergyLine+1, EnergyLine+1+Nr):
-            PESList.append([lines[iLine].split(" ")[-2], lines[iLine].split(" ")[-1]])
-        # convert them into float
-        PESList = [[float(i) for i in j] for j in PESList]
+            if "FINAL SINGLE POINT ENERGY" in line:
+                words = line.split()
+                if len(words)>6:
+                    PESList.append(float(words[6]))
+                else:
+                    PESList.append(float(words[4]))
+                iPES += 1
+            if "R  :" in line:
+                words = line.split("R  :")
+                rList.append(float(words[1]))
+                ir += 1
+            # else:
+            #     if "r =" in line:
+            #         words = line.split("r =")
+            #         rList.append(float(words[1].split(";")[0]))
+            #         ir += 1
+    if (iPES != Nr):
+        raise Exception("Either the # of r or the # of energy does not match the desired #, please check outputs")
+
     if os.path.exists(PESFile):
         os.remove(PESFile)
     file = open(PESFile,"w")
@@ -227,8 +265,9 @@ def ReadPES(*, Nr, OutputFile, EnergyType):
     file.write("# r/A Energy/Hartree \n")
     # write value out
     for iLine in range(Nr):
-        file.write(str(PESList[iLine][0])+" "+str(PESList[iLine][1])+"\n")
-    return PESList
+        file.write(str(rList[iLine])+" "+str(PESList[iLine])+"\n")
+
+    return rList, PESList
 
 # Read single point energy, can only be used for single point energy calculation (N/A for PES calculation)
 def ReadSPE(OutputFile):
@@ -249,7 +288,24 @@ def ReadSPE(OutputFile):
     # header
     file.write("# Single point energy data\n")
     file.write("# Energy/Hartree \n")
-    fil.write(str(SPE)+"\n")
+    file.write(str(SPE)+"\n")
+    return SPE
+
+# extract PES from PES file
+def GetPES(PESFile):
+    rList = []
+    PESList = []
+    with open(PESFile,"r") as f:
+        lines = f.read().split("\n")
+        for line in lines[2:-1]:
+            rList.append(float(line.split(" ")[0]))
+            PESList.append(float(line.split(" ")[1]))
+    return rList, PESList
+
+def GetSPE(SPEFile):
+    with open(SPEFile,"r") as f:
+        lines = f.read().split("\n")
+        SPE = float(lines[2])
     return SPE
 
 class AtomInfo(object):
@@ -409,6 +465,7 @@ class const(object):
     def __init__(self):
         # ORCA 4.2.1 manual
         self.Hartree2eV = 27.2113834
+        self.eV2cm = 8065.54477
         # NIST CODATA 2018
         self.eV2K       = 1.160451812e4
         self.Hartree2K  = self.Hartree2eV*self.eV2K
@@ -416,6 +473,12 @@ class const(object):
         self.Bohr2A     = 0.5291772083
         # Boltzmann in eV
         self.Boltzmann  = 8.617333262e-5
+        # eV to J
+        self.eV2J       = 1.602176634e-19
+        # Avogadro's const
+        self.NA         = 6.02214076e23
+        # NIST CCCBDB
+        self.Hartree2kcal = 627.5
 
 #--------------------------------------------------------------
 # Old ORCA_SAFT class

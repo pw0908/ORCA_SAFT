@@ -1,0 +1,8 @@
+# Basic Mode
+# 
+
+! DLPNO-CCSD(T) aug-CC-pV5Z aug-CC-pV5Z/C RIJK verytightscf TightPNO 
+%maxcore 6000
+%scf maxiter 999 end
+%mdci TCutPairs 0 TCutPNO 1e-8 LocMaxIter 10000 LocMaxIterLED 1000  end
+%basis auxjk "autoaux" end
