@@ -7,6 +7,7 @@ from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
 from openbabel import pybel
 from copy import deepcopy
+import const
 
 # Generate input files for ORCA calculations
 # This input file generator is expected to generate input files
@@ -29,7 +30,7 @@ class GenerateInput(object):
     self.AtomInfo.append(deepcopy(AtomInfo(mol)))
  
  # generate calculation for single molecule
- def InputPure(self, mode = "single", suffix = "pure", ncpus = 8, orcaproc = None):
+ def InputPure(self, mode="single", suffix="pure", ncpus=8, orcaproc=None):
     if orcaproc is None:
         nprocs = ncpus
     else:
@@ -53,8 +54,105 @@ class GenerateInput(object):
     # coordinates from AtomInfo
     file.write("* xyz 0 1\n")
     for iAtom in range(AI[0].NAtoms):
-        file.write("  "+AI[0].type[iAtom]+"(1)\t"+str(AI[0].coord[iAtom][0])+"\t"+str(AI[0].coord[iAtom][1])+"\t"+str(AI[0].coord[iAtom][2])+"\n")
+        file.write("  "+AI[0].type[iAtom]+"(1)\t"+str(AI[0].coord[iAtom][0])+
+        "\t"+str(AI[0].coord[iAtom][1])+"\t"+str(AI[0].coord[iAtom][2])+"\n")
     file.write("*\n\n\n")    
+    file.close()
+ 
+ def InputPureCP(self, rval, molecule=1, mode = "single", suffix = "pure", 
+    ncpus = 8, group = None, ori = None, orcaproc = None):
+    if molecule not in {1,2}:
+        raise Exception("molecule need to be either 1 or 2")
+    if orcaproc is None:
+        nprocs = ncpus
+    else:
+        nprocs = orcaproc
+    AI = self.AtomInfo
+    # so far considered only Td geometry 
+    if group == "Td":
+        AI[0].TdOrient(ori[0])
+        AI[1].TdOrient(ori[1])
+    # possibly write a function in future to systematically check the two-body
+    # orientations in a systematic way.
+    else:
+        pass
+    DimerFileName = self.smiles+"_"+suffix+"_CP_"+str(molecule)+"_"+self.method
+    if None not in {group, ori}:
+        DimerFileName += ("_"+group+ori)
+    DimerFileName += ".inp"
+    if os.path.exists(DimerFileName):
+        os.remove(DimerFileName)
+    file = open(DimerFileName,"w")
+    # preset methods
+    with open(self.method+".txt") as f:
+        lines = f.read().split("\n")
+        for i in range(len(lines)):
+            file.write(lines[i]+"\n")
+
+    if mode == "parallel":
+        file.write("%pal nprocs "+str(int(nprocs))+" end\n")
+    
+    # coords block
+    file.write("\n")
+    file.write("%coords\n")
+    file.write("CTyp\txyz\n")
+    file.write("Charge\t0\n")
+    file.write("Mult\t1\n")
+    # define parameters for varied r
+    file.write("pardef\n")
+    if isinstance(rval, float):
+        file.write("\tr = "+str(rval)+";\n")
+    elif isinstance(rval, list):
+        Crval = "["
+        for irval in rval:
+            Crval += str(irval) + " " 
+        Crval += "]" 
+        file.write("\tr "+Crval+";\n")
+    file.write("end\n")
+    file.write("coords\n")
+    
+    # dimer position, counterpoise correction will make one of the molecule to 
+    # be the "ghost" - with only the basis sets left there, the electrons and
+    # ions are not.
+    # for real molecule is the molecule 1
+    if molecule == 1:
+        # Molecule 1
+        for iAtom in range(AI[0].NAtoms):
+            file.write("  "+AI[0].type[iAtom]+"\t"\
+            +str(AI[0].coord[iAtom][0])+"\t"\
+            +str(AI[0].coord[iAtom][1])+"\t"\
+            +str(AI[0].coord[iAtom][2])+"\n")
+            
+        # Molecule 2 (ghost)
+        for iAtom in range(AI[1].NAtoms):
+            file.write("  "+AI[1].type[iAtom]+":\t"\
+            +str(AI[1].coord[iAtom][0])+"\t"\
+            +"{"+ str(AI[1].coord[iAtom][1]) +"+r}\t"\
+            +str(AI[1].coord[iAtom][2])+"\n")
+    # for real molecule is the molecule 2
+    elif molecule == 2:
+        # Molecule 1 (ghost)
+        for iAtom in range(AI[0].NAtoms):
+            file.write("  "+AI[0].type[iAtom]+":\t"\
+            +str(AI[0].coord[iAtom][0])+"\t"\
+            +str(AI[0].coord[iAtom][1])+"\t"\
+            +str(AI[0].coord[iAtom][2])+"\n")
+            
+        # Molecule 2 
+        for iAtom in range(AI[1].NAtoms):
+            file.write("  "+AI[1].type[iAtom]+"\t"\
+            +str(AI[1].coord[iAtom][0])+"\t"\
+            +"{"+ str(AI[1].coord[iAtom][1]) +"+r}\t"\
+            +str(AI[1].coord[iAtom][2])+"\n")
+    
+    file.write("end\n")
+    file.write("end\n")
+    # use the MOs generated in the last iteration
+    if isinstance(rval, list):
+        file.write("%method\n")
+        file.write("ScanGuess MORead\n")
+        file.write("end\n")
+    file.write("\n\n\n")    
     file.close()
 
  def InputDimer(self, rval, mode = "single", suffix = "dimer", ncpus = 8, group = None, ori = None, orcaproc = None):
@@ -139,30 +237,36 @@ class GetSAFTParameters(object):
     pass
 
 # function for running ORCA, default is single mode
-# for the meaning of the kwargs, see GeneratePBS() function
-def RunORCA(InputFile, mode = "single", \
- hour = 0, minute = 30, node = 1, mem = 16, ncpus = 8, env = "abinitioSAFT", path_orca = "orca"):
+# for the meaning of the kwargs, see GenerateJobFile() function
+def RunORCA(InputFile, mode = "single", sys = "ICLChemEng",\
+    hour = 0, minute = 30, node = 1, mem = 16, ncpus = 8, env = "os",\
+    path_orca = "orca", email = None):
     if mode == "single":
         # just run orca
         print(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out")
-        subprocess.run(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out", shell=True)
+        subprocess.run(path_orca+" "+InputFile+">"+\
+            InputFile.split(".")[0]+".out", shell=True)
     if mode == "parallel":
         # check if the path typed in is the full orca path
         if path_orca == "orca":
             raise Exception("Exact orca path need to be specified")
         # generate PBS file, and get PBS file name
-        PBSName = GeneratePBS(InputFile=InputFile,hour=hour,minute=minute,node=node,mem=mem,ncpus=ncpus,env=env,path_orca=path_orca)
-        print("qsub "+'"'+PBSName+'"')
-        subprocess.run("qsub "+'"'+PBSName+'"', shell=True)
+        JobName = GenerateJobFile(InputFile=InputFile,sys=sys,hour=hour,\
+            minute=minute,node=node,mem=mem,ncpus=ncpus,env=env,\
+            path_orca=path_orca,email=email)
+        print("qsub "+'"'+JobName+'"')
+        subprocess.run("qsub "+'"'+JobName+'"', shell=True)
 
 # function for cleaning unnecessary temporary ORCA files
 def CleanTemp(smiles):
     matches = [".pbs", ".o", ".e", ".out", ".inp", ".pes", ".spe"]
     for filename in glob.glob("./*"):
-        # only clean files with the specified SMILES, prevent the case that specifies "C", but clean files such as "CC"
+        # only clean files with the specified SMILES, prevent the case that 
+        # specifies "C", but clean files such as "CC"
         if smiles in filename:
             if smiles in {filename.split("_")[0][2:], filename.split("_")[1]}:
-        	    # Don't remove pbs, potential energy surface, single point energy, HPC output, error, ORCA input and output files
+        	    # Don't remove pbs, potential energy surface, single point 
+        	    # energy, HPC output, error, ORCA input and output files
                 if not any(CFormat in filename for CFormat in matches):
                     os.remove(filename)
 
@@ -170,7 +274,8 @@ def CleanTemp(smiles):
 def CleanOE(smiles):
     # Remove files that aren't necessary
     for filename in glob.glob("./*"):
-        # only clean files with the specified SMILES, prevent the case that specifies "C", but clean files such as "CC"
+        # only clean files with the specified SMILES, prevent the case that 
+        # specifies "C", but clean files such as "CC"
         if smiles in filename:
             if smiles in {filename.split("_")[0][2:], filename.split("_")[1]}:
                 matches = [".o", ".e"]
@@ -180,45 +285,78 @@ def CleanOE(smiles):
 
 # function for generating PBS file for submitting HPC job
 # hour, minute: HPC machine time
-# node, mem, ncpus: # of node, memory size (in GB) and # of cpus (also equal to processors)
+# node, mem, ncpus: # of node, memory size (in GB) and # of cpus (also equal 
+# to processors)
 # env: anaconda3 environment for running ORCA
-# path_orca: orca path, need to be the full path, but relative path (../ and ./) is acceptable
-def GeneratePBS(*, InputFile, hour, minute, node, mem, ncpus, env, path_orca):
-    # extract PBS name from the input ORCA file
-    PBSName = "ORCA_"+InputFile.split(".")[0]+".pbs"
-    if os.path.exists(PBSName):
-        os.remove(PBSName)
-    file = open(PBSName,"w")
-    # wall time need to be in HH:MM:SS
-    if hour < 10:
-        Chour = "0"+str(int(hour))
-    elif hour > 10:
-        Chour = str(int(hour))
-    if minute < 10:
-        Cminute = "0"+str(int(minute))
-    elif minute > 10:
-        Cminute = str(int(minute))
-    file.write("#PBS -l walltime="+Chour+":"+Cminute+":00\n")
-    # resource request
-    file.write("#PBS -l select="+str(int(node))+":ncpus="+str(int(ncpus))+":mem="+str(int(mem))+"gb:mpiprocs="+str(int(ncpus))+"\n")  
-    file.write("\n")       
-    # activate anaconda3 and the environment
-    file.write("module load anaconda3/personal\n")
-    file.write("module load orca/4.2.1\n")
-    file.write("source activate "+env+"\n")
-    # need to set an environment variable of OpenMPI
-    file.write("export OMPI_MCA_btl=self,vader,tcp\n")
-    file.write("\n")
-    # the job submitted will be sent to another location to be run, so if we want to access to
-    # some locations in home directory, cd to $PBS_O_WORKDIR is needed
-    file.write('cd "$PBS_O_WORKDIR" \n')
+# path_orca: orca path, need to be the full path, but relative path (../ and 
+# ./) is acceptable
+def GenerateJobFile(*, InputFile, sys = "ICLChemEng", hour = 0, minute = 30,\
+    node = 1, mem = 16, ncpus = 8, email = None, env, path_orca):
+    JobName = "ORCA_"+InputFile.split(".")[0]
+    if sys == "ICLChemEng":
+        # extract job name from the input ORCA file
+        JobName += ".csh"
+    elif sys == "ICLcx1":
+        # extract PBS name from the input ORCA file
+        JobName += ".pbs" 
+    else:
+        raise Exception("sys need to be 'ICLChemEng' (default) or 'ICLcx1'")       
+    if os.path.exists(JobName):
+        os.remove(JobName)
+    file = open(JobName,"w")
+
+    if sys == "ICLcx1":
+        # wall time need to be in HH:MM:SS
+        if hour < 10:
+            Chour = "0"+str(int(hour))
+        elif hour > 10:
+            Chour = str(int(hour))
+        if minute < 10:
+            Cminute = "0"+str(int(minute))
+        elif minute > 10:
+            Cminute = str(int(minute))
+        file.write("#PBS -l walltime="+Chour+":"+Cminute+":00\n")
+        # resource request
+        file.write("#PBS -l select="+str(int(node))+":ncpus="+str(int(ncpus))\
+            +":mem="+str(int(mem))+"gb:mpiprocs="+str(int(ncpus))+"\n")  
+        file.write("\n")       
+        # activate anaconda3 and the environment
+        file.write("module load anaconda3/personal\n")
+        file.write("module load orca/4.2.1\n")
+        file.write("source activate "+env+"\n")
+        # need to set an environment variable of OpenMPI
+        file.write("export OMPI_MCA_btl=self,vader,tcp\n")
+        file.write("\n")
+        # the job submitted will be sent to another location to be run, so if 
+        # we want to access tosome locations in home directory, cd to 
+        # $PBS_O_WORKDIR is needed
+        file.write('cd "$PBS_O_WORKDIR" \n')
+    elif sys == "ICLChemEng":
+        # C shell
+        file.write("#! /bin/csh \n")
+        # log name
+        file.write("#$ -j y -o $JOB_NAME.$JOB_ID.log \n")
+        # current working directory
+        file.write("#$ -cwd \n")
+        # send email
+        if email is None:
+            pass
+        elif isinstance(email, str):
+            file.write("#$ -m e -M "+email + "\n")
+        file.write("#$ -pe smp "+str(int(ncpus))+"-"+str(int(ncpus+2))+" \n")
+        file.write("#$ -l mem_total="+str(mem)+"G\n")
+        file.write("\n")
+        file.write("conda activate "+env+"\n")
+        # need to set an environment variable of OpenMPI
+        file.write("setenv OMPI_MCA_btl self,vader,tcp\n")
+
     # call ORCA to run the input script
     file.write('"'+path_orca+'"'+" "+'"'+InputFile+'"'+">"+'"'+InputFile.split(".")[0]+".out"+'"'+"\n")
     file.write("\n")
     # deactivate the environment in the end
     file.write("conda deactivate\n")
     file.close()
-    return PBSName
+    return JobName
 
 # read the potential energy surface (PES) data from the output file as specified in OutputFile
 # Nr: the # of r calculated
@@ -255,7 +393,8 @@ def ReadPES(*, Nr, OutputFile):
             #         rList.append(float(words[1].split(";")[0]))
             #         ir += 1
     if (iPES != Nr):
-        raise Exception("Either the # of r or the # of energy does not match the desired #, please check outputs")
+        raise Exception("Either the # of r or the # of energy does not match \
+            the desired #, please check outputs")
 
     if os.path.exists(PESFile):
         os.remove(PESFile)
@@ -269,7 +408,8 @@ def ReadPES(*, Nr, OutputFile):
 
     return rList, PESList
 
-# Read single point energy, can only be used for single point energy calculation (N/A for PES calculation)
+# Read single point energy, can only be used for single point energy 
+# calculation (N/A for PES calculation)
 def ReadSPE(OutputFile):
     # generate SPE file name, in .spe
     SPEFile = OutputFile.split(".out")[0]+"_SPE.spe"
@@ -459,26 +599,6 @@ class AtomInfo(object):
 
     for iAtom in range(len(self.type)):
         self.coord[iAtom] = r.apply(self.coord[iAtom]) 
-
-class const(object):
-    # useful constants
-    def __init__(self):
-        # ORCA 4.2.1 manual
-        self.Hartree2eV = 27.2113834
-        self.eV2cm = 8065.54477
-        # NIST CODATA 2018
-        self.eV2K       = 1.160451812e4
-        self.Hartree2K  = self.Hartree2eV*self.eV2K
-        # ORCA 4.2.1 manual
-        self.Bohr2A     = 0.5291772083
-        # Boltzmann in eV
-        self.Boltzmann  = 8.617333262e-5
-        # eV to J
-        self.eV2J       = 1.602176634e-19
-        # Avogadro's const
-        self.NA         = 6.02214076e23
-        # NIST CCCBDB
-        self.Hartree2kcal = 627.5
 
 #--------------------------------------------------------------
 # Old ORCA_SAFT class
