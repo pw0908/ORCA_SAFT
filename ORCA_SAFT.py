@@ -4,10 +4,13 @@ from math import exp, sqrt, acos, cos, sin
 from scipy.interpolate import interp1d
 from scipy.optimize import fsolve,minimize
 from scipy.spatial.transform import Rotation as R
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from openbabel import pybel
 from copy import deepcopy
 import const
+from shutil import copy
 
 # Generate input files for ORCA calculations
 # This input file generator is expected to generate input files
@@ -155,7 +158,8 @@ class GenerateInput(object):
     file.write("\n\n\n")    
     file.close()
 
- def InputDimer(self, rval, mode = "single", suffix = "dimer", ncpus = 8, group = None, ori = None, orcaproc = None):
+ def InputDimer(self, rval, mode = "single", suffix = "dimer", ncpus = 8,\
+    group = None, ori = None, orcaproc = None):
     if orcaproc is None:
         nprocs = ncpus
     else:
@@ -165,8 +169,8 @@ class GenerateInput(object):
     if group == "Td":
         AI[0].TdOrient(ori[0])
         AI[1].TdOrient(ori[1])
-    # possibly write a function in future to systematically check the two-body orientations in a 
-    # systematic way.
+    # possibly write a function in future to systematically check the two-
+    # body orientations in a systematic way.
     else:
         pass
     DimerFileName = self.smiles+"_"+suffix+"_"+self.method
@@ -239,7 +243,7 @@ class GetSAFTParameters(object):
 # function for running ORCA, default is single mode
 # for the meaning of the kwargs, see GenerateJobFile() function
 def RunORCA(InputFile, mode = "single", sys = "ICLChemEng",\
-    hour = 0, minute = 30, node = 1, mem = 16, ncpus = 8, env = "os",\
+    hour = 0, minute = 30, node = 1, mem = None, ncpus = 8, env = "os",\
     path_orca = "orca", email = None):
     if mode == "single":
         # just run orca
@@ -291,7 +295,7 @@ def CleanOE(smiles):
 # path_orca: orca path, need to be the full path, but relative path (../ and 
 # ./) is acceptable
 def GenerateJobFile(*, InputFile, sys = "ICLChemEng", hour = 0, minute = 30,\
-    node = 1, mem = 16, ncpus = 8, email = None, env, path_orca):
+    node = 1, mem = None, ncpus = 8, email = None, env, path_orca):
     JobName = "ORCA_"+InputFile.split(".")[0]
     if sys == "ICLChemEng":
         # extract job name from the input ORCA file
@@ -306,6 +310,8 @@ def GenerateJobFile(*, InputFile, sys = "ICLChemEng", hour = 0, minute = 30,\
     file = open(JobName,"w")
 
     if sys == "ICLcx1":
+        if not isinstance(mem,int):
+            raise Exception("For jobs submitted to cx1, mem must be an integer")
         # wall time need to be in HH:MM:SS
         if hour < 10:
             Chour = "0"+str(int(hour))
@@ -344,26 +350,31 @@ def GenerateJobFile(*, InputFile, sys = "ICLChemEng", hour = 0, minute = 30,\
         elif isinstance(email, str):
             file.write("#$ -m e -M "+email + "\n")
         file.write("#$ -pe smp "+str(int(ncpus))+"-"+str(int(ncpus+2))+" \n")
-        file.write("#$ -l mem_total="+str(mem)+"G\n")
+        if mem is not None:
+            mem = round(mem/ncpus,1)
+            file.write("#$ -l mem_total="+str(mem)+"G\n")
         file.write("\n")
         file.write("conda activate "+env+"\n")
         # need to set an environment variable of OpenMPI
         file.write("setenv OMPI_MCA_btl self,vader,tcp\n")
 
     # call ORCA to run the input script
-    file.write('"'+path_orca+'"'+" "+'"'+InputFile+'"'+">"+'"'+InputFile.split(".")[0]+".out"+'"'+"\n")
+    file.write('"'+path_orca+'"'+" "+'"'+InputFile+'"'+">"+'"'+\
+        InputFile.split(".")[0]+".out"+'"'+"\n")
     file.write("\n")
     # deactivate the environment in the end
     file.write("conda deactivate\n")
     file.close()
     return JobName
 
-# read the potential energy surface (PES) data from the output file as specified in OutputFile
+# read the potential energy surface (PES) data from the output file as 
+# specified in OutputFile
 # Nr: the # of r calculated
-# EnergyType: in some calculations, there are different types of energies, for HFLD, there are
-# "'Actual Energy'", "SCF Energy" and "MDCI Energy". The "'Actual Energy'" is the same as 
-# "SCF Energy", but they are not the energy we are looking for. We need "MDCI Energy" because
-# the CI part between the two fragments are added to the SCF energy. 
+# EnergyType: in some calculations, there are different types of energies, for
+# HFLD, there are "'Actual Energy'", "SCF Energy" and "MDCI Energy". The 
+# "'Actual Energy'" is the same as "SCF Energy", but they are not the energy we
+# are looking for. We need "MDCI Energy" because the CI part between the two
+# fragments are added to the SCF energy. 
 def ReadPES(*, Nr, OutputFile):
     # generate PES file name, in .pes
     PESFile = OutputFile.split(".out")[0]+"_PES.pes"
@@ -414,14 +425,14 @@ def ReadSPE(OutputFile):
     # generate SPE file name, in .spe
     SPEFile = OutputFile.split(".out")[0]+"_SPE.spe"
     with open(OutputFile,"r") as f:
-            lines = f.read().split("\n")
-            for i,line in enumerate(lines):
-                if "FINAL SINGLE POINT ENERGY" in line:
-                    words =line.split()
-                    if len(words)>6:
-                        SPE = float(words[6])
-                    else:
-                        SPE = float(words[4])
+        lines = f.read().split("\n")
+        for i,line in enumerate(lines):
+            if "FINAL SINGLE POINT ENERGY" in line:
+                words =line.split()
+                if len(words)>6:
+                    SPE = float(words[6])
+                else:
+                    SPE = float(words[4])
     if os.path.exists(SPEFile):
         os.remove(SPEFile)
     file = open(SPEFile,"w")
@@ -431,16 +442,51 @@ def ReadSPE(OutputFile):
     file.write(str(SPE)+"\n")
     return SPE
 
+# merge two PES files, the 2nd file will be added onto the 1st file
+def MergePES(PESin1, PESin2, PESNew = None):
+    if os.path.isfile('./'+PESin1) + os.path.isfile('./'+PESin2) != 2:
+        raise Exception("input file not found")
+    elif PESNew is not None:
+        if (os.path.isfile('./'+PESNew)) is True:
+            raise Exception(PESNew+" already exists")
+    
+    with open(PESin2,"r") as f2:
+        lines2 = f2.read().split("\n")[2:]
+    
+    if PESNew is None:
+        f1w = open(PESin1,"a")
+    else:
+        with open(PESin1, "r") as f1:
+            lines1 = f1.read()
+        f1w = open(PESNew,"w")
+        for line1 in lines1:
+            f1w.write(line1)
+    
+    for line2 in lines2:
+        f1w.write(line2+"\n")
+
+    f1w.close()
+
 # extract PES from PES file
 def GetPES(PESFile):
     rList = []
     PESList = []
     with open(PESFile,"r") as f:
         lines = f.read().split("\n")
+        lines = [jline for jline in lines if jline != '']
         for line in lines[2:-1]:
             rList.append(float(line.split(" ")[0]))
             PESList.append(float(line.split(" ")[1]))
+    RemoveDup(rList)
+    RemoveDup(PESList)
+    if len(rList) != len(PESList):
+        raise Exception("Inconsistent data in PES file, please check")
     return rList, PESList
+
+def RemoveDup(seq):
+    seen = set()
+    seen_add = seen.add
+    return [x for x in seq if not (x in seen or seen_add(x))]
 
 def GetSPE(SPEFile):
     with open(SPEFile,"r") as f:
