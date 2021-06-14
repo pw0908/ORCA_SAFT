@@ -1,0 +1,6 @@
+# Basic Mode
+# 
+
+! RI-CCSD aug-CC-pVTZ aug-CC-pVTZ\C verytightscf 
+%maxcore 50000
+%scf maxiter 999 end

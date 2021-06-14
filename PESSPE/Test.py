@@ -152,10 +152,10 @@ rint = (2.0-0.9)/49
 rval = [2.0*r_0 - rint*r_0*i for i in range(50)]
 Nr = 50
 path_orca = "../../../../orca_4_2_1_linux_x86-64_openmpi314/orca"
-method = "HFLD_pV5Z_conservative"
+method = "DLPNO-CCSDT_pVQZ_1E-3TCutDO"
 
 folder = "./"+smiles+"_"+method
-
+folder = "./PESSPE"
 if not os.path.exists(folder):
     os.mkdir(folder)
 os.chdir(folder)
@@ -165,15 +165,15 @@ copy("../ORCA_SAFT.py", "./")
 copy("../Test.py", "./")
 copy("../const.py", "./")
 # on cx1 clusters
-# RunPureCP(smiles=smiles, method=method, path_orca=path_orca, rval=rval, \
-# minute = 0, node = 1, mem = 90, ncpus = 32, env = "abinitioSAFT", sys = "ICLcx1", hour = 24,molecule = 1, \
-# orcaproc = 4)
+RunPureCP(smiles=smiles, method=method, path_orca=path_orca, rval=rval, \
+minute = 0, node = 1, mem = 90, ncpus = 32, env = "abinitioSAFT", sys = "ICLcx1", hour = 24,molecule = 1, \
+orcaproc = 4)
 RunDimer(smiles=smiles, method=method, path_orca=path_orca, rval=rval, \
 minute = 0, node = 1, mem = 90, ncpus = 32, env = "abinitioSAFT", sys = "ICLcx1", hour = 24, \
-orcaproc = 8)
+orcaproc = 2)
     
 #---------------------------------------------------------
-# os.chdir(folder)
+# os.chdir("./PESSPE")
 
 # MergePES(smiles+"_pure_CP_1_"+method+"_1-48"+"_PES.pes", smiles+"_pure_CP_1_"+method+"_49"+"_PES.pes", smiles+"_pure_CP_1_"+method+"_PES.pes")
 # time.sleep(5)
@@ -191,9 +191,9 @@ orcaproc = 8)
 
 # r1, PES1 = GetPES(smiles+"_pure_CP_1_"+method+"_PES.pes")
 # r3, PES3 = GetPES(smiles+"_dimer_"+method+"_PES.pes")
-# for iR in range(len(r1)):
+# for iR in range(len(r3)):
 #     PES3[iR] -= 2.0* PES1[iR]
-#     PES3[iR] *= const.Hartree2K
+#     PES1[iR] *= const.Hartree2K
 
 # plt.rc('font',family='serif',size=16)
 # plt.rc('text',usetex=True)
@@ -201,13 +201,13 @@ orcaproc = 8)
 # plt.rc('ytick',labelsize='small')
 # fig = plt.figure(figsize=(7,5.25))
 # ax = fig.add_subplot(1,1,1)
-# ax.plot(r1,PES3,color='r',ls='solid',label = "aVQZ;aV6Z/C no RI",linewidth=2)
+# ax.plot(r3,PES1,color='r',ls='solid',label = "Ne single DLPNO-CCSD(T)/QZ",linewidth=2)
 # ax.set_xlabel(r'$r / \AA$')
 # ax.set_ylabel(r'$\phi(r)$ / K')
-# plt.ylim((-50,50))
+# # plt.ylim((-250,200))
 # ax.legend(frameon=False)
 # plt.gcf().subplots_adjust(left=0.15)
-# plt.savefig(smiles+"_"+method+".png")
+# plt.savefig(smiles+"_"+method+"_single_CP.png")
 
 #---------------------------------------------------------
 

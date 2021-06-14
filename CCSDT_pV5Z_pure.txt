@@ -1,0 +1,6 @@
+# Basic Mode
+# 
+
+! CCSD(T) aug-CC-pV5Z verytightscf 
+%maxcore 6000
+%scf maxiter 999 end

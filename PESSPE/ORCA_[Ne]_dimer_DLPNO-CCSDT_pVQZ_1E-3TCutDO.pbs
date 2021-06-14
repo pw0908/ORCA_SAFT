@@ -1,0 +1,12 @@
+#PBS -l walltime=24:00:00
+#PBS -l select=1:ncpus=32:mem=90gb:mpiprocs=32
+
+module load anaconda3/personal
+module load orca/4.2.1
+source activate abinitioSAFT
+export OMPI_MCA_btl=self,vader,tcp
+
+cd "$PBS_O_WORKDIR" 
+"../../../../orca_4_2_1_linux_x86-64_openmpi314/orca" "[Ne]_dimer_DLPNO-CCSDT_pVQZ_1E-3TCutDO.inp">"[Ne]_dimer_DLPNO-CCSDT_pVQZ_1E-3TCutDO.out"
+
+conda deactivate

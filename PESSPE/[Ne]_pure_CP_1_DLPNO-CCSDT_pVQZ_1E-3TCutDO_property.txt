@@ -1,0 +1,1876 @@
+-------------------------------------------------------------
+----------------------- !PROPERTIES! ------------------------
+-------------------------------------------------------------
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 1
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 1
+   prop. index: 1
+        SCF Energy:     -128.5437573882
+------------------------ !PROPERTY! -------------------------
+   name:        MDCI_Energies
+   comment:     The MDCI energies
+   geom. index: 1
+   prop. index: 1
+        Total number of Electrons                                                     10
+        Number of correlated Electrons                                                 8
+        Number of alpha correlated Electrons                                           4
+        Number of beta correlated Electrons                                            4
+        Reference Energy:                                                -128.5437864787
+        Total Correlation Energy:                                          -0.3036904066
+        Alpha-Alpha Pairs Correlation Energy (No (T))                       0.0000000000
+        Beta-Beta Pairs Correlation Energy (No (T))                         0.0000000000
+        Alpha-Beta Pairs Correlation Energy (No (T))                        0.0000000000
+        Singlet pairs energy of double amplitudes (No (T))                  0.0000000000
+        Triplet pairs energy of double amplitudes (No (T))                  0.0000000000
+        Singlet pairs energy of quadratic single amplitudes (No (T))        0.0000000000
+        Triplet pairs energy of quadratic single amplitudes (No (T))        0.0000000000
+        Triples Correction Energy:                                         -0.0057257607
+        Total MDCI Energy:                                               -128.8474768853
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 1
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000033647
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000001  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000001  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 2
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 2
+   prop. index: 1
+        SCF Energy:     -128.5437573934
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 2
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000046061
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000002  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000002  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 3
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 3
+   prop. index: 1
+        SCF Energy:     -128.5437574006
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 3
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000061980
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000002  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000002  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 4
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 4
+   prop. index: 1
+        SCF Energy:     -128.5437574103
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 4
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000081890
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000003  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000003  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 5
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 5
+   prop. index: 1
+        SCF Energy:     -128.5437574231
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 5
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000106561
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000004  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000004  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 6
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 6
+   prop. index: 1
+        SCF Energy:     -128.5437574396
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 6
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000136570
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000005  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000005  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 7
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 7
+   prop. index: 1
+        SCF Energy:     -128.5437574608
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 7
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000172956
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000007  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000007  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 8
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 8
+   prop. index: 1
+        SCF Energy:     -128.5437574875
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 8
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000216642
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000009  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000009  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 9
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 9
+   prop. index: 1
+        SCF Energy:     -128.5437575207
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 9
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000268625
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000011  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000011  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 10
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 10
+   prop. index: 1
+        SCF Energy:     -128.5437575614
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 10
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000329422
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000013  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000013  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 11
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 11
+   prop. index: 1
+        SCF Energy:     -128.5437576109
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 11
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000400928
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000016   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000016   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 12
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 12
+   prop. index: 1
+        SCF Energy:     -128.5437576700
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 12
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000483888
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000019   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000019   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 13
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 13
+   prop. index: 1
+        SCF Energy:     -128.5437577400
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 13
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000579306
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000023   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000023   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 14
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 14
+   prop. index: 1
+        SCF Energy:     -128.5437578217
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 14
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000688161
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000027   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000027   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 15
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 15
+   prop. index: 1
+        SCF Energy:     -128.5437579162
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 15
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000811362
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000032   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000032   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 16
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 16
+   prop. index: 1
+        SCF Energy:     -128.5437580242
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 16
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0000949750
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000037  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000037  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 17
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 17
+   prop. index: 1
+        SCF Energy:     -128.5437581467
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 17
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0001104078
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000043  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000043  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 18
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 18
+   prop. index: 1
+        SCF Energy:     -128.5437582846
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 18
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0001274965
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000050  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000050  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 19
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 19
+   prop. index: 1
+        SCF Energy:     -128.5437584388
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 19
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0001463014
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000058  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000058  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 20
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 20
+   prop. index: 1
+        SCF Energy:     -128.5437586106
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 20
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0001668767
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000066  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000066  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 21
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 21
+   prop. index: 1
+        SCF Energy:     -128.5437588018
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 21
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0001892772
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000074  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000074  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 22
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 22
+   prop. index: 1
+        SCF Energy:     -128.5437590146
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 22
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0002135627
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000084  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000084  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 23
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 23
+   prop. index: 1
+        SCF Energy:     -128.5437592520
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 23
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0002398006
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000094  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000094  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 24
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 24
+   prop. index: 1
+        SCF Energy:     -128.5437595173
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 24
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0002678829
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000105  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000105  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 25
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 25
+   prop. index: 1
+        SCF Energy:     -128.5437598142
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 25
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0002982394
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000117  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000117  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 26
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 26
+   prop. index: 1
+        SCF Energy:     -128.5437601463
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 26
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0003307866
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000130  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000130  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 27
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 27
+   prop. index: 1
+        SCF Energy:     -128.5437605160
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 27
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0003655646
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000144  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000144  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 28
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 28
+   prop. index: 1
+        SCF Energy:     -128.5437609239
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 28
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0004025489
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000158  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000158  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 29
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 29
+   prop. index: 1
+        SCF Energy:     -128.5437613670
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 29
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0004416247
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000174  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000174  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 30
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 30
+   prop. index: 1
+        SCF Energy:     -128.5437618382
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 30
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0004825183
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000190  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000190  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 31
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 31
+   prop. index: 1
+        SCF Energy:     -128.5437623249
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 31
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0005247433
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000206  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000206  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 32
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 32
+   prop. index: 1
+        SCF Energy:     -128.5437628091
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 32
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0005675527
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000223  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000223  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 33
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 33
+   prop. index: 1
+        SCF Energy:     -128.5437632678
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 33
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0006099051
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000240  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000240  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 34
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 34
+   prop. index: 1
+        SCF Energy:     -128.5437636757
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 34
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0006504526
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000256   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000256   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 35
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 35
+   prop. index: 1
+        SCF Energy:     -128.5437640085
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 35
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0006875662
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000271  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000271  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 36
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 36
+   prop. index: 1
+        SCF Energy:     -128.5437642486
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 36
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0007194285
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000283   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000283   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 37
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 37
+   prop. index: 1
+        SCF Energy:     -128.5437643916
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 37
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0007441362
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000293   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000293   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 38
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 38
+   prop. index: 1
+        SCF Energy:     -128.5437644529
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 38
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0007598905
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000299  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000299  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 39
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 39
+   prop. index: 1
+        SCF Energy:     -128.5437644742
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 39
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0007651850
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000301   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000301   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 40
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 40
+   prop. index: 1
+        SCF Energy:     -128.5437645273
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 40
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0007587401
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000299  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000299  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 41
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 41
+   prop. index: 1
+        SCF Energy:     -128.5437647145
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 41
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0007407669
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000291  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000291  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 42
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 42
+   prop. index: 1
+        SCF Energy:     -128.5437651634
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 42
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0007115595
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000280  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000280  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 43
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 43
+   prop. index: 1
+        SCF Energy:     -128.5437660146
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 43
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0006725520
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000265  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000265  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 44
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 44
+   prop. index: 1
+        SCF Energy:     -128.5437674020
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 44
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0006260329
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000246  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000246  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 45
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 45
+   prop. index: 1
+        SCF Energy:     -128.5437694246
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 45
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0005749787
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000226   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000226   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 46
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 46
+   prop. index: 1
+        SCF Energy:     -128.5437721136
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 46
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0005227911
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000206   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000206   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 47
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 47
+   prop. index: 1
+        SCF Energy:     -128.5437754005
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 47
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0004727237
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000186  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000186  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 48
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 48
+   prop. index: 1
+        SCF Energy:     -128.5437790984
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 48
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0004279507
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000168  -0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000168  -0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 49
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 49
+   prop. index: 1
+        SCF Energy:     -128.5437829101
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 49
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0003900806
+        Electronic Contribution:
+                   0          1          2    
+      0      -0.000000  -0.000153   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0      -0.000000  -0.000153   0.000000
+------------------------ !PROPERTY! -------------------------
+   name:        PAL_Flags
+   comment:     The PAL Flags
+   geom. index: 50
+   prop. index: 1
+        Diskflag:     2
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Energy
+   comment:     The SCF energy
+   geom. index: 50
+   prop. index: 1
+        SCF Energy:     -128.5437864787
+------------------------ !PROPERTY! -------------------------
+   name:        SCF_Electric_Properties
+   comment:     The SCF Calculated Electric Properties
+   geom. index: 50
+   prop. index: 1
+       Filename                          : [Ne]_pure_CP_1_DLPNO-CCSDT_pVQZ_1E-3TCutDO.scfp 
+       Do Dipole Moment Calculation      : 1 
+       Do Quadrupole Moment Calculation  : 0 
+       Do Polarizability Calculation     : 0 
+** Dipole moment part of electric properties **
+        Magnitude of dipole moment (Debye) :        0.0003597939
+        Electronic Contribution:
+                   0          1          2    
+      0       0.000000  -0.000142   0.000000
+        Nuclear Contribution:
+                   0          1          2    
+      0      -0.000000   0.000000   0.000000
+        Total Dipole moment:
+                   0          1          2    
+      0       0.000000  -0.000142   0.000000
+-------------------------------------------------------------
+----------------------- !GEOMETRIES! ------------------------
+-------------------------------------------------------------
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    1
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.800000000000    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    2
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.734897959184    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    3
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.669795918367    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    4
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.604693877551    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    5
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.539591836735    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    6
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.474489795918    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    7
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.409387755102    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    8
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.344285714286    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    9
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.279183673469    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    10
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.214081632653    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    11
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.148979591837    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    12
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.083877551020    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    13
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    5.018775510204    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    14
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.953673469388    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    15
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.888571428571    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    16
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.823469387755    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    17
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.758367346939    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    18
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.693265306122    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    19
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.628163265306    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    20
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.563061224490    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    21
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.497959183673    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    22
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.432857142857    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    23
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.367755102041    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    24
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.302653061224    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    25
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.237551020408    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    26
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.172448979592    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    27
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.107346938776    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    28
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    4.042244897959    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    29
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.977142857143    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    30
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.912040816327    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    31
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.846938775510    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    32
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.781836734694    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    33
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.716734693878    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    34
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.651632653061    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    35
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.586530612245    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    36
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.521428571429    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    37
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.456326530612    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    38
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.391224489796    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    39
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.326122448980    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    40
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.261020408163    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    41
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.195918367347    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    42
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.130816326531    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    43
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.065714285714    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    44
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    3.000612244898    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    45
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    2.935510204082    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    46
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    2.870408163265    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    47
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    2.805306122449    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    48
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    2.740204081633    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    49
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    2.675102040816    0.000000000000
+------------------------ !GEOMETRY! -------------------------
+    Number of atoms:    2        Geometry Index:    50
+    Coordinates:
+            Ne    -0.000000000000    0.000000000000    0.000000000000
+            Ne:    0.000000000000    2.610000000000    0.000000000000
