@@ -1,8 +1,8 @@
-import subprocess,os,glob
+import os
 import numpy as np
 from math import exp, sqrt, acos, cos, sin
 from scipy.interpolate import interp1d
-from scipy.optimize import fsolve,minimize
+from scipy.optimize import minimize
 from scipy.spatial.transform import Rotation as R
 import matplotlib
 matplotlib.use('Agg')
@@ -12,12 +12,26 @@ from copy import deepcopy
 import const
 from shutil import copy
 
-# Generate input files for ORCA calculations
-# This input file generator is expected to generate input files
-# for different purposes, e.g. single molecule, dimer with different 
-# orientations and else 
 class GenerateInput(object):
- def __init__(self,smiles,method="HFLD_pVDZ",path_multiwfn="multiwfn"):
+ """
+ Generate input files for ORCA calculations. 
+ 
+ These input files are for the calculations of single molecule and dimer with different orientations.
+ 
+ Parameters
+ ----------
+ smiles: string
+     a SMILES string for molecule
+ method: string
+     name of header files for generating ORCA input files (without `.txt`); these input header files 
+     includes all information about basis sets and quantum chemistry methods, example files can be 
+     found in `ORCA_header` folder. 
+     
+ Returns
+ -------
+ no return
+ """
+ def __init__(self,smiles,method="HFLD_pVDZ"):
     
     # Create a Molecule object in pybel
     mol = pybel.readstring("smi",smiles)
@@ -27,34 +41,52 @@ class GenerateInput(object):
 
     self.smiles = smiles
     self.method = method
-    self.path_multiwfn = path_multiwfn
     self.AtomInfo = []
     self.AtomInfo.append(deepcopy(AtomInfo(mol)))
-    self.AtomInfo.append(deepcopy(AtomInfo(mol)))
  
- # generate calculation for single molecule
- def InputPure(self, mode="single", suffix="pure", ncpus=8, orcaproc=None):
-    if orcaproc is None:
-        nprocs = ncpus
-    else:
-        nprocs = orcaproc
+ def InputPure(self, mode="single", suffix="pure", nprocs=8):
+    """
+    Generate calculation input for a single molecule, without counterpoise correction
+    
+    Parameters
+    ----------
+    mode: string, "single" or "parallel"
+        mode of calculations, 
+        if "single", the generated file will be the input for a single processor serial calculation
+        if "parallel", the generated file will be the input for a parallel calculation 
+        if "parallel" mode is chosen, the ncpus variable need to be specified (default = 8), which is
+        the number of cpus for calculation
+    suffix: string
+        suffix for the input file name, the input file name has the following structure:
+        <SMILES of the species>_<suffix>_<method>.inp
+    nprocs: int > 0
+        number of processors to be used in parallel computations.
+        
+    Returns
+    -------
+    no return, generate an input file for single molecule calculation without counterpoise correction
+    """
     AI = self.AtomInfo
+    # generate input file name string
     PureFileName = self.smiles+"_"+suffix+"_"+self.method+".inp"
+    # test if file exists, if so, remove it and generate a new file.
     if os.path.exists(PureFileName):
         os.remove(PureFileName)
     file = open(PureFileName,"w")
-    with open(self.method+".txt") as f:
+
+    # copy the header file info
+    with open("./ORCA_header/"+self.method+".txt") as f:
         lines = f.read().split("\n")
         for i in range(len(lines)):
             file.write(lines[i]+"\n")
     
-    # processor number
+    # specify processor number
     if mode == "parallel":
         file.write("%pal nprocs "+str(int(nprocs))+" end\n")
 
     file.write("\n")
     
-    # coordinates from AtomInfo
+    # write coordinates from AtomInfo
     file.write("* xyz 0 1\n")
     for iAtom in range(AI[0].NAtoms):
         file.write("  "+AI[0].type[iAtom]+"(1)\t"+str(AI[0].coord[iAtom][0])+
@@ -63,13 +95,48 @@ class GenerateInput(object):
     file.close()
  
  def InputPureCP(self, rval, molecule=1, mode = "single", suffix = "pure", 
-    ncpus = 8, group = None, ori = None, orcaproc = None):
+    nprocs = 8, group = None, ori = None):
+    """
+    Generate calculation input for a single molecule, with counterpoise correction.
+    
+    By now it supports calculations for a single atom, or molecules with tetragonal (Td) symmetry.
+    
+    Parameters
+    ----------
+    rval: float > 0, or a list of floats > 0
+        the center of mass distance of two species
+        can be either a float number or a list of float numbers
+    molecule: int, 1 or 2
+        specify energy of which species is calculated, 1 corresponds to the species with its center of
+        mass located at the origin
+    mode: string, "single" or "parallel"
+        mode of calculations, 
+        if "single", the generated file will be the input for a single processor serial calculation
+        if "parallel", the generated file will be the input for a parallel calculation 
+        if "parallel" mode is chosen, the ncpus variable need to be specified (default = 8), which is
+        the number of cpus for calculation
+    suffix: string
+        suffix for the input file name, the input file name has the following structure:
+        for atom: 
+        <SMILES of the species>_<suffix>_CP_<method>.inp
+        for molecule with Td symmetry: 
+        <SMILES of the species>_<suffix>_CP_<method>_<group>_<ori>.inp
+    nprocs: int > 0
+        number of processors to be used in parallel computations.
+    group: None or string "Td"
+        The symmetry group for species; if the calculation is performed for atom, then the default None
+        is used, if the molecule has Td symmetry (which is the only supported group), then group = "Td".
+    ori: string in {"AA", "AB", "AC", "AD", "CA", "CB", "EE", "EF", "AE", "AF", "FA", "CF"}
+        Only supports for Td symmetry, specify orientations of the species and the ghost species. The 
+        first letter is for the species 1 and the second letter is for the species 2. See readme for 
+        the definition of these orientations.
+    Returns
+    -------
+    no return, generate an input file for single molecule calculation without counterpoise correction
+    """
     if molecule not in {1,2}:
         raise Exception("molecule need to be either 1 or 2")
-    if orcaproc is None:
-        nprocs = ncpus
-    else:
-        nprocs = orcaproc
+    # extract species information
     AI = self.AtomInfo
     # so far considered only Td geometry 
     if group == "Td":
@@ -79,15 +146,18 @@ class GenerateInput(object):
     # orientations in a systematic way.
     else:
         pass
+    # create file name and initialize file
     DimerFileName = self.smiles+"_"+suffix+"_CP_"+str(molecule)+"_"+self.method
     if None not in {group, ori}:
         DimerFileName += ("_"+group+"_"+ori)
     DimerFileName += ".inp"
+
+    # copy the header file
     if os.path.exists(DimerFileName):
         os.remove(DimerFileName)
     file = open(DimerFileName,"w")
     # preset methods
-    with open(self.method+".txt") as f:
+    with open("./ORCA_header/"+self.method+".txt") as f:
         lines = f.read().split("\n")
         for i in range(len(lines)):
             file.write(lines[i]+"\n")
@@ -95,13 +165,14 @@ class GenerateInput(object):
     if mode == "parallel":
         file.write("%pal nprocs "+str(int(nprocs))+" end\n")
     
-    # coords block
+    # write coordinate block
     file.write("\n")
     file.write("%coords\n")
     file.write("CTyp\txyz\n")
     file.write("Charge\t0\n")
     file.write("Mult\t1\n")
-    # define parameters for varied r
+
+    # define a parameter for varying r
     file.write("pardef\n")
     if isinstance(rval, float):
         file.write("\tr = "+str(rval)+";\n")
@@ -117,22 +188,21 @@ class GenerateInput(object):
     # dimer position, counterpoise correction will make one of the molecule to 
     # be the "ghost" - with only the basis sets left there, the electrons and
     # ions are not.
-    # for real molecule is the molecule 1
+    # for the case where real molecule is the molecule 1
     if molecule == 1:
         # Molecule 1
         for iAtom in range(AI[0].NAtoms):
             file.write("  "+AI[0].type[iAtom]+"\t"\
             +str(AI[0].coord[iAtom][0])+"\t"\
             +str(AI[0].coord[iAtom][1])+"\t"\
-            +str(AI[0].coord[iAtom][2])+"\n")
-            
+            +str(AI[0].coord[iAtom][2])+"\n") 
         # Molecule 2 (ghost)
         for iAtom in range(AI[1].NAtoms):
             file.write("  "+AI[1].type[iAtom]+":\t"\
             +str(AI[1].coord[iAtom][0])+"\t"\
             +"{"+ str(AI[1].coord[iAtom][1]) +"+r}\t"\
             +str(AI[1].coord[iAtom][2])+"\n")
-    # for real molecule is the molecule 2
+    # for the case where real molecule is the molecule 2
     elif molecule == 2:
         # Molecule 1 (ghost)
         for iAtom in range(AI[0].NAtoms):
@@ -140,7 +210,6 @@ class GenerateInput(object):
             +str(AI[0].coord[iAtom][0])+"\t"\
             +str(AI[0].coord[iAtom][1])+"\t"\
             +str(AI[0].coord[iAtom][2])+"\n")
-            
         # Molecule 2 
         for iAtom in range(AI[1].NAtoms):
             file.write("  "+AI[1].type[iAtom]+"\t"\
@@ -158,12 +227,48 @@ class GenerateInput(object):
     file.write("\n\n\n")    
     file.close()
 
- def InputDimer(self, rval, mode = "single", suffix = "dimer", ncpus = 8,\
-    group = None, ori = None, orcaproc = None):
+ def InputDimer(self, rval, mode = "single", suffix = "dimer", nprocs = 8,\
+    group = None, ori = None):
+    """
+    Generate calculation input for a pair of species.
+   
+    By now it supports calculations for a single atom, or molecules with tetragonal (Td) symmetry.
+    
+    Parameters
+    ----------
+    rval: float > 0, or a list of floats > 0
+        the center of mass distance of two species
+        can be either a float number or a list of float numbers
+    mode: string, "single" or "parallel"
+        mode of calculations, 
+        if "single", the generated file will be the input for a single processor serial calculation
+        if "parallel", the generated file will be the input for a parallel calculation 
+        if "parallel" mode is chosen, the ncpus variable need to be specified (default = 8), which is
+        the number of cpus for calculation
+    suffix: string
+        suffix for the input file name, the input file name has the following structure:
+        for atoms:
+        <SMILES of the species>_<suffix>_<method>.inp
+        for molecules:
+        <SMILES of the species>_<suffix>_<method>_<group>_<ori>.inp
+    nprocs: int > 0
+        number of processors to be used in parallel computations.
+    group: None or string "Td"
+        The symmetry group for species; if the calculation is performed for atom, then the default None
+        is used, if the molecule has Td symmetry (which is the only supported group), then group = "Td".
+    ori: string in {"AA", "AB", "AC", "AD", "CA", "CB", "EE", "EF", "AE", "AF", "FA", "CF"}
+        Only supports for Td symmetry, specify orientations of the species. The first letter is for the
+        species 1 and the second letter is for species 2. See readme for the definition of these 
+        orientations.
+    Returns
+    -------
+    no return, generate an input file for a pair of species calculation
+    """
     if orcaproc is None:
         nprocs = ncpus
     else:
         nprocs = orcaproc
+    # extract species information
     AI = self.AtomInfo
     # so far considered only Td geometry 
     if group == "Td":
@@ -173,6 +278,7 @@ class GenerateInput(object):
     # body orientations in a systematic way.
     else:
         pass
+    # generate dimer file name
     DimerFileName = self.smiles+"_"+suffix+"_"+self.method
     if None not in {group, ori}:
         DimerFileName += ("_"+group+"_"+ori)
@@ -181,7 +287,7 @@ class GenerateInput(object):
         os.remove(DimerFileName)
     file = open(DimerFileName,"w")
     # preset methods
-    with open(self.method+".txt") as f:
+    with open("./ORCA_header/"+self.method+".txt") as f:
         lines = f.read().split("\n")
         for i in range(len(lines)):
             file.write(lines[i]+"\n")
@@ -233,149 +339,32 @@ class GenerateInput(object):
     file.write("\n\n\n")    
     file.close()
 
-# collection of functions to get SAFT parameters out, and 
-# sigma, epsilon -> Vol and m -> lambdas 
-# write this as a class? or a separate python file?
-class GetSAFTParameters(object):
- def __init__(self):
-    pass
-
-# function for running ORCA, default is single mode
-# for the meaning of the kwargs, see GenerateJobFile() function
-def RunORCA(InputFile, mode = "single", sys = "ICLChemEng",\
-    hour = 0, minute = 30, node = 1, mem = None, ncpus = 8, env = "os",\
-    path_orca = "orca", email = None):
-    if mode == "single":
-        # just run orca
-        print(path_orca+" "+InputFile+">"+InputFile.split(".")[0]+".out")
-        subprocess.run(path_orca+" "+InputFile+">"+\
-            InputFile.split(".")[0]+".out", shell=True)
-    if mode == "parallel":
-        # check if the path typed in is the full orca path
-        if path_orca == "orca":
-            raise Exception("Exact orca path need to be specified")
-        # generate PBS file, and get PBS file name
-        JobName = GenerateJobFile(InputFile=InputFile,sys=sys,hour=hour,\
-            minute=minute,node=node,mem=mem,ncpus=ncpus,env=env,\
-            path_orca=path_orca,email=email)
-        print("qsub "+'"'+JobName+'"')
-        subprocess.run("qsub "+'"'+JobName+'"', shell=True)
-
-# function for cleaning unnecessary temporary ORCA files
-def CleanTemp(smiles):
-    matches = [".pbs", ".o", ".e", ".out", ".inp", ".pes", ".spe"]
-    for filename in glob.glob("./*"):
-        # only clean files with the specified SMILES, prevent the case that 
-        # specifies "C", but clean files such as "CC"
-        if smiles in filename:
-            if smiles in {filename.split("_")[0][2:], filename.split("_")[1]}:
-        	    # Don't remove pbs, potential energy surface, single point 
-        	    # energy, HPC output, error, ORCA input and output files
-                if not any(CFormat in filename for CFormat in matches):
-                    os.remove(filename)
-
-# function for cleaning unnecessary output and error message from HPC
-def CleanOE(smiles):
-    # Remove files that aren't necessary
-    for filename in glob.glob("./*"):
-        # only clean files with the specified SMILES, prevent the case that 
-        # specifies "C", but clean files such as "CC"
-        if smiles in filename:
-            if smiles in {filename.split("_")[0][2:], filename.split("_")[1]}:
-                matches = [".o", ".e"]
-        	    # remove HPC output and error files
-                if any(CFormat in filename for CFormat in matches):
-                    os.remove(filename)
-
-# function for generating PBS file for submitting HPC job
-# hour, minute: HPC machine time
-# node, mem, ncpus: # of node, memory size (in GB) and # of cpus (also equal 
-# to processors)
-# env: anaconda3 environment for running ORCA
-# path_orca: orca path, need to be the full path, but relative path (../ and 
-# ./) is acceptable
-def GenerateJobFile(*, InputFile, sys = "ICLChemEng", hour = 0, minute = 30,\
-    node = 1, mem = None, ncpus = 8, email = None, env, path_orca):
-    JobName = "ORCA_"+InputFile.split(".")[0]
-    if sys == "ICLChemEng":
-        # extract job name from the input ORCA file
-        JobName += ".csh"
-    elif sys == "ICLcx1":
-        # extract PBS name from the input ORCA file
-        JobName += ".pbs" 
-    else:
-        raise Exception("sys need to be 'ICLChemEng' (default) or 'ICLcx1'")       
-    if os.path.exists(JobName):
-        os.remove(JobName)
-    file = open(JobName,"w")
-
-    if sys == "ICLcx1":
-        if not isinstance(mem,int):
-            raise Exception("For jobs submitted to cx1, mem must be an integer")
-        # wall time need to be in HH:MM:SS
-        if hour < 10:
-            Chour = "0"+str(int(hour))
-        elif hour > 10:
-            Chour = str(int(hour))
-        if minute < 10:
-            Cminute = "0"+str(int(minute))
-        elif minute > 10:
-            Cminute = str(int(minute))
-        file.write("#PBS -l walltime="+Chour+":"+Cminute+":00\n")
-        # resource request
-        file.write("#PBS -l select="+str(int(node))+":ncpus="+str(int(ncpus))\
-            +":mem="+str(int(mem))+"gb:mpiprocs="+str(int(ncpus))+"\n")  
-        file.write("\n")       
-        # activate anaconda3 and the environment
-        file.write("module load anaconda3/personal\n")
-        file.write("module load orca/4.2.1\n")
-        file.write("source activate "+env+"\n")
-        # need to set an environment variable of OpenMPI
-        file.write("export OMPI_MCA_btl=self,vader,tcp\n")
-        file.write("\n")
-        # the job submitted will be sent to another location to be run, so if 
-        # we want to access tosome locations in home directory, cd to 
-        # $PBS_O_WORKDIR is needed
-        file.write('cd "$PBS_O_WORKDIR" \n')
-    elif sys == "ICLChemEng":
-        # C shell
-        file.write("#! /bin/csh \n")
-        # log name
-        file.write("#$ -j y -o $JOB_NAME.$JOB_ID.log \n")
-        # current working directory
-        file.write("#$ -cwd \n")
-        # send email
-        if email is None:
-            pass
-        elif isinstance(email, str):
-            file.write("#$ -m e -M "+email + "\n")
-        file.write("#$ -pe smp "+str(int(ncpus))+"-"+str(int(ncpus+2))+" \n")
-        if mem is not None:
-            mem = round(mem/ncpus,1)
-            file.write("#$ -l mem_total="+str(mem)+"G\n")
-        file.write("\n")
-        file.write("conda activate "+env+"\n")
-        # need to set an environment variable of OpenMPI
-        file.write("setenv OMPI_MCA_btl self,vader,tcp\n")
-
-    # call ORCA to run the input script
-    file.write('"'+path_orca+'"'+" "+'"'+InputFile+'"'+">"+'"'+\
-        InputFile.split(".")[0]+".out"+'"'+"\n")
-    file.write("\n")
-    # deactivate the environment in the end
-    file.write("conda deactivate\n")
-    file.close()
-    return JobName
-
-# read the potential energy surface (PES) data from the output file as 
-# specified in OutputFile
-# Nr: the # of r calculated
-# EnergyType: in some calculations, there are different types of energies, for
-# HFLD, there are "'Actual Energy'", "SCF Energy" and "MDCI Energy". The 
-# "'Actual Energy'" is the same as "SCF Energy", but they are not the energy we
-# are looking for. We need "MDCI Energy" because the CI part between the two
-# fragments are added to the SCF energy. 
 def ReadPES(*, Nr, OutputFile):
+    """
+    Read the potential energy surface (PES) data from the output file as specified in OutputFile,
+    also generate a file which is a list of r values and energies.
+    
+    Suitable for outputs of single-species calculations with counterpoise correction, and pair 
+    calculations.
+    
+    A note on energy types: in some calculations, there are different types of energies, for HFLD, there 
+    are "'Actual Energy'", "SCF Energy" and "MDCI Energy". The "'Actual Energy'" is the same as 
+    "SCF Energy", but they are not the energy we are looking for. We need "MDCI Energy" because the CI 
+    part between the two fragments are added to the SCF energy. 
+    
+    Parameters
+    ----------
+    Nr: int > 0
+        the # of r calculated
+    OutputFile: string
+        name of the output files, with the suffix ".out"
+        
+    Returns
+    -------
+    rList, PESList: a list of r values and energy values 
+    also generate a file of these values, with file name
+    <OUtputFile without .out>_PES.pes
+    """
     # generate PES file name, in .pes
     PESFile = OutputFile.split(".out")[0]+"_PES.pes"
     # a list of PES values
@@ -386,7 +375,7 @@ def ReadPES(*, Nr, OutputFile):
     with open(OutputFile,"r") as f:
         lines = f.read().split("\n")
         for iLine,line in enumerate(lines):
-            # find the correct line for PES data
+            # find the correct line for PES data and read it
             if "FINAL SINGLE POINT ENERGY" in line:
                 words = line.split()
                 if len(words)>6:
@@ -394,15 +383,11 @@ def ReadPES(*, Nr, OutputFile):
                 else:
                     PESList.append(float(words[4]))
                 iPES += 1
+            # find the r value and read it
             if "R  :" in line:
                 words = line.split("R  :")
                 rList.append(float(words[1]))
                 ir += 1
-            # else:
-            #     if "r =" in line:
-            #         words = line.split("r =")
-            #         rList.append(float(words[1].split(";")[0]))
-            #         ir += 1
     if (iPES != Nr):
         raise Exception("Either the # of r or the # of energy does not match \
             the desired #, please check outputs")
@@ -419,9 +404,19 @@ def ReadPES(*, Nr, OutputFile):
 
     return rList, PESList
 
-# Read single point energy, can only be used for single point energy 
-# calculation (N/A for PES calculation)
 def ReadSPE(OutputFile):
+    """
+    Read single point energy, can only be used for single point energy calculations
+    
+    Parameters
+    ----------
+    OutputFile: string
+        name of the output files, with the suffix ".out"
+        
+    Returns
+    -------
+    SPE: a single point energy
+    """
     # generate SPE file name, in .spe
     SPEFile = OutputFile.split(".out")[0]+"_SPE.spe"
     with open(OutputFile,"r") as f:
@@ -436,14 +431,30 @@ def ReadSPE(OutputFile):
     if os.path.exists(SPEFile):
         os.remove(SPEFile)
     file = open(SPEFile,"w")
-    # header
+    # write the SPE in a file
     file.write("# Single point energy data\n")
     file.write("# Energy/Hartree \n")
     file.write(str(SPE)+"\n")
     return SPE
 
-# merge two PES files, the 2nd file will be added onto the 1st file
 def MergePES(PESin1, PESin2, PESNew = None):
+    """
+    merge two PES files
+    
+    Parameters
+    ----------
+    PESin1: string
+        name of the 1st PES file, with the file extension name
+    PESin2: string
+        name of the 2nd PES file, with the file extension name
+    PESNew: string or None
+        name of the new PES file, with the file extension name 
+        if it is None, the 2nd file will be added onto the 1st file
+        
+    Returns
+    -------
+    no return, either the 1st file is appended with the 2nd file, or a new file is generated
+    """
     if os.path.isfile('./'+PESin1) + os.path.isfile('./'+PESin2) != 2:
         raise Exception("input file not found")
     elif PESNew is not None:
@@ -467,8 +478,19 @@ def MergePES(PESin1, PESin2, PESNew = None):
 
     f1w.close()
 
-# extract PES from PES file
 def GetPES(PESFile):
+    """
+    extract PES from PES file
+    
+    Parameters
+    ----------
+    PESFile: string
+        PES file name
+        
+    Returns
+    -------
+    rList, PESList: a list of r values and energy values 
+    """
     rList = []
     PESList = []
     with open(PESFile,"r") as f:
@@ -477,6 +499,7 @@ def GetPES(PESFile):
         for line in lines[2:-1]:
             rList.append(float(line.split(" ")[0]))
             PESList.append(float(line.split(" ")[1]))
+    # remove duplicated r and PES values
     RemoveDup(rList)
     RemoveDup(PESList)
     if len(rList) != len(PESList):
@@ -484,18 +507,53 @@ def GetPES(PESFile):
     return rList, PESList
 
 def RemoveDup(seq):
+    """
+    remove duplicated entries in a list, if any
+    
+    Parameters
+    ----------
+    seq: list
+        a list with possible duplicates
+    
+    Returns
+    -------
+    a list with no duplicate
+    """
     seen = set()
     seen_add = seen.add
     return [x for x in seq if not (x in seen or seen_add(x))]
 
 def GetSPE(SPEFile):
+    """
+    a function to extract SPE from the file
+    
+    Parameters
+    ----------
+    SPEFile: string
+        the file name for the SPE file
+    
+    Returns
+    -------
+    SPE value
+    """
     with open(SPEFile,"r") as f:
         lines = f.read().split("\n")
         SPE = float(lines[2])
     return SPE
 
 class AtomInfo(object):
- # get a list of atom types and coords
+ """
+ get a list of atom types and coordinations, with a collection of helper functions
+ 
+ Parameters
+ ----------
+ mol: Pybel molecule object
+     molecule object for the species of interests
+ 
+ Returns
+ -------
+ no return
+ """
  def __init__(self, mol):
     mol.make3D()
     self.type   = [] 
@@ -516,6 +574,9 @@ class AtomInfo(object):
     self.SetCoMOrigin()
 
  def GetCoM(self):
+    """
+    obtain the center of mass of the species
+    """
     # get center of mass
     moment = [0., 0., 0.]
     for iAtom in range(len(self.type)):
@@ -524,32 +585,42 @@ class AtomInfo(object):
     self.CoM = [iMoment / self.M for iMoment in moment]
 
  def SetCoMOrigin(self):
-    # set the molecule center of mass to the origin 
+    """
+    set the molecule center of mass to the origin 
+    """
     for iAtom in range(len(self.type)):
         for jCoord in range(3):
             self.coord[iAtom][jCoord] -= self.CoM[jCoord]
 
  def SetCenterOrigin(self):
-    # for tetragonal point group Td only, set the center atom to be at the origin
-    # using SetToOrigin() based on CoM gives the center coordinate a tiny displacement from origin
+    """
+    for tetragonal point group Td only, set the center atom to be at the origin
+    using SetToOrigin() based on CoM gives the center coordinate a tiny displacement from origin
+    """
     atom_center = self.coord[0].copy()
     for iAtom in range(len(self.type)):
         for jCoord in range(3):
             self.coord[iAtom][jCoord] -= atom_center[jCoord]
 
  def UnitVector(self, vector):
-    # get a unit vector from a given vector
+    """
+    get a unit vector from a given vector
+    """
     length = self.Length(vector)
     unitvector = [iVector / length for iVector in vector]
     return unitvector 
  
  def Length(self, vector):
-    # get the length of the vector
+    """
+    get the length of a vector
+    """
     length = sqrt( sum(iVector*iVector for iVector in vector) )
     return length
 
  def Reflection(self, axis):
-    # reflection about the plane that is perpandicular to the given axis and contains the origin
+    """
+    reflection about the plane that is perpandicular to the given axis and contains the origin
+    """
     for iAtom in range(len(self.type)):
         if axis == "x":
             self.coord[0] = -self.coord[0]
@@ -559,6 +630,14 @@ class AtomInfo(object):
             self.coord[2] = -self.coord[2]
 
  def TdOrient(self, config = "A"):
+    """
+    for a molecule with Td symmetry, orient the molecule in a given orientation
+   
+    Parameters
+    ----------
+    config: a character {"A", "B", "C", "D", "E", "F"}
+        possible orientation configurations; for the meaning of these, see readme
+    """
     self.SetCenterOrigin()
     UVec12 = [self.UnitVector(self.coord[1]), self.UnitVector(self.coord[2])]
     if config == "A":
@@ -646,210 +725,41 @@ class AtomInfo(object):
     for iAtom in range(len(self.type)):
         self.coord[iAtom] = r.apply(self.coord[iAtom]) 
 
-#--------------------------------------------------------------
-# Old ORCA_SAFT class
+class Potential(object):
+ """
+ A class that takes numerical r and V values as inputs and obtain all the Mie parameters.
+ 
+ Parameters
+ ----------
+ r: list of float > 0
+     the inter species distance
+ V: list of float
+     a list of potential values, in Hartree
+ 
+ Returns
+ -------
+ no return
+ """
+ def __init__(self, r, V):
+    self.r = r 
+    # now energy is in K
+    self.V = V * const.Hartree2K
 
-class ORCA_SAFT(object):
- def __init__(self,smiles,method="HFLD_pVDZ.txt",path_orca="orca",path_multiwfn="multiwfn"):
-    
-    # Create a Molecule object in pybel
-    mol = pybel.readstring("smi",smiles)
-
-    # Set it up in 3D coordinates
-    mol.make3D()
-
-    self.smiles = smiles
-    self.method = method
-    self.path_orca = path_orca
-    self.path_multiwfn = path_multiwfn
-    self.AtomInfo = []
-    self.AtomInfo.append(deepcopy(AtomInfo(mol)))
-    self.AtomInfo.append(deepcopy(AtomInfo(mol)))
-    AI = self.AtomInfo
-    #----------------------------------------------------------------------
-    # need a handle to input the orientations from job submission 
-    TdOriList = ["AA", "AB", "AC", "AD", "CA", "CB", "EE", "EF", "AE", "AF", "FA", "CF"]
-    #----------------------------------------------------------------------
-
-    # Making pure input file
-    if os.path.exists(smiles+"_pure.inp"):
-        os.remove(smiles+"_pure.inp")
-    file = open(smiles+"_pure.inp","w")
-    with open(method) as f:
-        lines = f.read().split("\n")
-        for i in range(len(lines)):
-            file.write(lines[i]+"\n")
-    file.write("\n")
-    file.write("* xyz 0 1\n")
-
-    # Obtain the atom coordinates for a molecule
-    # N.B. This may need some tweaking as this is not often reproducible
-    
-    # the old way to assign coordinates:
-    # for i in range(len(mol.atoms)):
-    #     atom = mol.atoms[i]
-    #     atom_type = atom.type.split("3")[0]
-    #     x = atom.coords[0]
-    #     y = atom.coords[1]
-    #     z = atom.coords[2]
-    #     file.write("  "+atom_type+"(1)\t"+str(x)+"\t"+str(y)+"\t"+str(z)+"\n")
-
-    for i in range(AI[0].NAtoms):
-        file.write("  "+AI[0].type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
-    file.write("*\n\n\n")    
-    file.close()
-    
-    #----------------------------------------------------------------------
-    # need modify
-    # Add step here to determine Vol and good guess for sigma from multiwfn
-    if os.path.exists(smiles+"_opt.inp"):
-        os.remove(smiles+"_opt.inp")
-    file = open(smiles+"_opt.inp","w")
-    with open(method) as f:
-        lines = f.read().split("\n")
-        for i in range(len(lines)):
-            if "!" in lines[i]:
-                file.write("! RKS B3LYP D3BJ Opt"+"\n")
-    file.write("\n")
-    file.write("* xyz 0 1\n")
-    for i in range(AI[0].NAtoms):
-        file.write("  "+AI[0].type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
-    for i in range(AI[0].NAtoms):
-        file.write("  "+AI[0].type[i]+"(1)\t"+str(AI[1].coord[i][0])+"\t"+str(AI[1].coord[i][1])+"\t"+str(AI[1].coord[i][2])+"\n")
-    file.write("*\n\n\n")    
-    file.close()
-
-    print("orca "+smiles+"_opt.inp>"+smiles+"_opt.out")
-    subprocess.run(path_orca+" "+smiles+"_opt.inp>"+smiles+"_opt.out", shell=True)
-    
-    x = []
-    y = []
-    z = []
-    with open(smiles+"_opt.xyz","r") as f:
-        lines = f.read().split("\n")
-        for i,line in enumerate(lines[2:len(lines)-1]):
-            words =line.split()
-            x.append(float(words[1]))
-            y.append(float(words[2]))
-            z.append(float(words[3]))
-    r0 = ((x[0]-x[1])**2+(y[0]-y[1])**2+(z[0]-z[1])**2)**(0.5)
-    r = np.linspace(0.95*r0,2*r0,50)
-    self.r = r
-    #----------------------------------------------------------------------
-
-    # Creating dimer input file
-    if os.path.exists(smiles+"_dimer.inp"):
-        os.remove(smiles+"_dimer.inp")
-    file = open(smiles+"_dimer.inp","w")
-    with open(method) as f:
-        lines = f.read().split("\n")
-        for i in range(len(lines)):
-            file.write(lines[i]+"\n")
-    file.write("\n")
-    file.write("%coords\n")
-    file.write("CTyp\txyz\n")
-    file.write("Charge\t0\n")
-    file.write("Mult\t1\n")
-    file.write("pardef\n")
-    file.write("\tr = "+str(0.95*r0)+", "+str(2*r0)+", "+str(int(50))+";"+"\n")
-    file.write("end\n")
-    file.write("coords\n")
-    
-    # dimer file
-    # Molecule 1
-    for i in range(AI.NAtoms):
-        file.write("  "+AI.type[i]+"(1)\t"+str(AI[0].coord[i][0])+"\t"+str(AI[0].coord[i][1])+"\t"+str(AI[0].coord[i][2])+"\n")
-        
-    # Molecule 2
-    for i in range(AI.NAtoms):
-        file.write("  "+AI.type[i]+"(2)\t"+str(AI[1].coord[i][0])+"+{r}"+"\t"+str(AI[1].coord[i][1])+"\t"+str(AI[1].coord[i][2])+"\n")
-
-    file.write("end\n")
-    file.write("end\n")
-    file.write("%method\n")
-    file.write("ScanGuess MORead\n")
-    file.write("end\n")
-    file.write("\n\n\n")    
-    file.close()
-
- def MolVol(self,cutoff=0.001):
-    # Attempt to obtain V_QC from multiwfn
-    smiles = self.smiles
-    path_multiwfn = self.path_multiwfn
-
-    # Create input file
-    if os.path.exists(smiles+"_pure_wfn.txt"):
-        os.remove(smiles+"_pure_wfn.txt")
-    file = open(smiles+"_pure_wfn.txt","w")
-    file.write("12\n")
-    file.write("1\n")
-    file.write("1\n")
-    file.write(str(cutoff)+"\n")
-    file.write("0\n")
-    file.close()
-
-    # Run input file
-    subprocess.run(path_multiwfn+" "+smiles+"_pure_wfn.txt>"+smiles+"_VdW_vol.txt", shell=True)
-
-    # Read output file
-    with open(smiles+"_VdW_vol.txt","r") as f:
-        lines = f.read().split("\n")
-        for j,line in enumerate(lines):
-            if "Volume:" in line:
-                words = line.split()
-                Vol = float(words[4])
-    return Vol
- def Potential(self):
-    smiles = self.smiles
-    r      = self.r
-    path_orca = self.path_orca
-    # Run pure input file
-    print("orca "+smiles+"_pure.inp>"+smiles+"_pure.out")
-    subprocess.run(path_orca+" "+smiles+"_pure.inp>"+smiles+"_pure.out", shell=True)
-    
-    with open(smiles+"_pure.out","r") as f:
-        lines = f.read().split("\n")
-        for i,line in enumerate(lines):
-            if "FINAL SINGLE POINT ENERGY" in line:
-                words =line.split()
-                if len(words)>6:
-                    V_pure = float(words[6])
-                else:
-                    V_pure = float(words[4])
-    
-    # Run dimer input file
-    print("orca "+smiles+"_dimer.inp>"+smiles+"_dimer.out")
-    subprocess.run(path_orca+" "+smiles+"_dimer.inp>"+smiles+"_dimer.out", shell=True)
-    
-    V = np.zeros(np.shape(r))
-    with open(smiles+"_dimer.out","r") as f:
-        lines = f.read().split("\n")
-        i=0
-        for j,line in enumerate(lines):
-            if "FINAL SINGLE POINT ENERGY" in line:
-                words =line.split()
-                if len(words)>6:
-                    V[i] = (float(words[6])-2*V_pure)*315775.082
-                else:
-                    V[i] = (float(words[4])-2*V_pure)*315775.082
-                i+=1
-    return V
- def Clean(self):
-    smiles = self.smiles
-
-    # Remove files that aren't necessary
-    for filename in glob.glob("./*"):
-        if smiles in filename:
-            # Don't remove input and output files
-            if ("out" not in filename) and ("inp" not in filename):
-                os.remove(filename)
  def SAFT_Params(self):
+    """
+    Obtain SAFT parameters for potentials obtained by QC calculations with no analytic form
     
-    # Obtain the QC potential
-    V = self.Potential()
-    r = self.r
-    self.V = V
-
+    Parameters
+    ----------
+    no parameters
+    
+    Returns
+    -------
+    a list of epsilon, sigma, and lambda_R values
+    also the following attributes are generated: epsilon, sigma, lambda_A, lambda_R
+    """
+    r = self.r 
+    V = self.V 
     # Obtain sigma and epsilon from QC
     epsilon = -np.amin(V)
     sigma = interp1d(V[0:np.where(V==-epsilon)[0][0]],r[0:np.where(V==-epsilon)[0][0]])(0)
@@ -875,7 +785,7 @@ class ORCA_SAFT(object):
     r,V = arg
     V_Mie = (x[0]/(x[0]-6))*(x[0]/6)**(6/(x[0]-6))*((1/r)**x[0]-(1/r)**6)
     return np.sum((((V-V_Mie)/V)**2)*np.exp(-1-V))
-
+ 
  def Plotting(self):
     epsilon = self.epsilon
     sigma   = self.sigma
@@ -902,7 +812,3 @@ class ORCA_SAFT(object):
     # ax.set_ylim(-1.1, 2)
     # ax.set_xlim(0.6,1.9)
     plt.show()
-
-# old ORCA_SAFT class end
-# ---------------------------------------------------------------
-
